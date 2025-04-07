@@ -1,0 +1,28 @@
+# Kontrola wersji
+.git
+.github
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js
+.next
+out
+
+# Środowisko
+.env*
+!.env.example
+.env.local
+
+# Inne
+README.md
+.DS_Store
+*.pem
+.vscode
+.idea
+*.log 

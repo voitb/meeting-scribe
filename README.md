@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YouTube Analyzer
 
-## Getting Started
+Aplikacja webowa pozwalająca na analizę zawartości filmów z YouTube poprzez transkrypcję audio i analizę tekstu.
 
-First, run the development server:
+## Funkcjonalności
+
+- Pobieranie audio z filmów YouTube (bez zapisywania plików lokalnie)
+- Transkrypcja audio przy użyciu Whisper przez Groq API
+- Analiza tekstu (Groq API) generująca:
+  - Krótkie streszczenie (1-2 akapity)
+  - Najważniejsze punkty (bullet points)
+  - Potencjalne pytania do dyskusji
+- Eksport wyników do PDF
+
+## Technologie
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- ytdl-core (pobieranie audio z YouTube)
+- Groq API (Whisper i LLM)
+- pdfkit (generowanie PDF)
+
+## Wymagania
+
+- Node.js (v18+)
+- pnpm
+- Klucz API Groq
+
+## Instalacja
+
+1. Sklonuj repozytorium:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url>
+cd youtube-analyzer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Zainstaluj zależności:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Utwórz plik `.env.local` i dodaj swój klucz API Groq:
 
-## Learn More
+```
+GROQ_API_KEY=twój_klucz_api_groq
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Uruchomienie aplikacji
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Uruchom serwer deweloperski:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+Aplikacja będzie dostępna pod adresem [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Uruchomienie w środowisku produkcyjnym
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Zbuduj aplikację:
+
+```bash
+pnpm build
+```
+
+2. Uruchom wersję produkcyjną:
+
+```bash
+pnpm start
+```
+
+## Wdrożenie na VPS (Docker + Coolify)
+
+Aplikacja może być łatwo wdrożona na serwerze VPS za pomocą Coolify:
+
+1. Skonfiguruj Coolify na swoim VPS
+2. Utwórz nowy projekt w Coolify
+3. Połącz repozytorium git
+4. Skonfiguruj zmienną środowiskową `GROQ_API_KEY`
+5. Wdróż aplikację
+
+## Licencja
+
+MIT
