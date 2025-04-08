@@ -43,6 +43,8 @@ export function YoutubeAnalyzer() {
     "Przygotowanie wyników",
   ];
 
+  console.log(result);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,13 +73,15 @@ export function YoutubeAnalyzer() {
         },
         body: JSON.stringify({ url: youtubeUrl }),
       });
-
+      console.log({ transcriptionResponse });
       if (!transcriptionResponse.ok) {
         const errorData = await transcriptionResponse.json();
         throw new Error(errorData.error || "Błąd podczas transkrypcji");
       }
 
       const transcriptionData = await transcriptionResponse.json();
+
+      console.log(transcriptionData);
 
       // Krok 2: Transkrypcja zakończona
       setCurrentStep(2);
@@ -90,7 +94,7 @@ export function YoutubeAnalyzer() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          transcript: transcriptionData.transcription,
+          transcript: transcriptionData.transcription.text,
           title: transcriptionData.title,
         }),
       });
@@ -140,7 +144,7 @@ export function YoutubeAnalyzer() {
         body: JSON.stringify({
           title: result.title,
           summary: result.summary,
-          keyPoints: result.keyPoints,
+          keyPoints: result?.keyPoints,
           discussionQuestions: result.discussionQuestions,
         }),
       });
@@ -258,7 +262,7 @@ export function YoutubeAnalyzer() {
                   Najważniejsze punkty
                 </h3>
                 <ul className="list-disc pl-5 text-muted-foreground space-y-1">
-                  {result.keyPoints.map((point, index) => (
+                  {result.keyPoints?.map((point, index) => (
                     <li key={index}>{point}</li>
                   ))}
                 </ul>

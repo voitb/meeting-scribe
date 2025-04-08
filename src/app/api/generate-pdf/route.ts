@@ -16,11 +16,13 @@ export async function POST(req: NextRequest) {
     const doc = new PDFDocument({
       margin: 50,
       size: 'A4',
+      // Wyłączamy automatyczne ładowanie czcionek
+      font: null
     });
 
     // Bufor na dane
     const buffers: Uint8Array[] = [];
-    doc.on('data', (chunk) => buffers.push(chunk));
+    doc.on('data', (chunk: Uint8Array) => buffers.push(chunk));
 
     // Obietnica zakończenia generowania
     const pdfPromise = new Promise<Buffer>((resolve) => {
@@ -32,24 +34,24 @@ export async function POST(req: NextRequest) {
 
     // Formatowanie dokumentu
     // Tytuł
-    doc.fontSize(20).font('Helvetica-Bold').text('Analiza filmu YouTube', { align: 'center' });
+    doc.fontSize(20).text('Analiza filmu YouTube', { align: 'center' });
     doc.moveDown();
     
     if (title) {
-      doc.fontSize(16).font('Helvetica-Bold').text('Tytuł filmu:', { underline: true });
-      doc.fontSize(14).font('Helvetica').text(title);
+      doc.fontSize(16).text('Tytuł filmu:', { underline: true });
+      doc.fontSize(14).text(title);
       doc.moveDown();
     }
 
     // Streszczenie
-    doc.fontSize(16).font('Helvetica-Bold').text('Streszczenie:', { underline: true });
-    doc.fontSize(12).font('Helvetica').text(summary);
+    doc.fontSize(16).text('Streszczenie:', { underline: true });
+    doc.fontSize(12).text(summary);
     doc.moveDown(2);
 
     // Najważniejsze punkty
     if (keyPoints && keyPoints.length > 0) {
-      doc.fontSize(16).font('Helvetica-Bold').text('Najważniejsze punkty:', { underline: true });
-      doc.fontSize(12).font('Helvetica');
+      doc.fontSize(16).text('Najważniejsze punkty:', { underline: true });
+      doc.fontSize(12);
       keyPoints.forEach((point: string, index: number) => {
         doc.text(`${index + 1}. ${point}`);
         doc.moveDown(0.5);
@@ -59,8 +61,8 @@ export async function POST(req: NextRequest) {
 
     // Pytania do dyskusji
     if (discussionQuestions && discussionQuestions.length > 0) {
-      doc.fontSize(16).font('Helvetica-Bold').text('Pytania do dyskusji:', { underline: true });
-      doc.fontSize(12).font('Helvetica');
+      doc.fontSize(16).text('Pytania do dyskusji:', { underline: true });
+      doc.fontSize(12);
       discussionQuestions.forEach((question: string, index: number) => {
         doc.text(`${index + 1}. ${question}`);
         doc.moveDown(0.5);
@@ -70,7 +72,7 @@ export async function POST(req: NextRequest) {
     // Stopka
     doc.moveDown(2);
     const date = new Date().toLocaleDateString('pl-PL');
-    doc.fontSize(10).font('Helvetica-Oblique').text(`Wygenerowano: ${date}`, { align: 'center' });
+    doc.fontSize(10).text(`Wygenerowano: ${date}`, { align: 'center' });
 
     // Zakończ dokument
     doc.end();
