@@ -114,7 +114,7 @@ export async function downloadYouTubeAudio(videoURL: string, tempBasePath: strin
   }
 }
 
-export async function transcribeAudio(audioFilePath: string): Promise<unknown> {
+export async function transcribeAudio(audioFilePath: string, language: string = "auto"): Promise<unknown> {
   const groq = new Groq();
   
   const transcriptionOptions = {
@@ -123,6 +123,7 @@ export async function transcribeAudio(audioFilePath: string): Promise<unknown> {
     prompt: "Specify context or spelling",
     response_format: "verbose_json" as ResponseFormat,
     timestamp_granularities: ["word", "segment"] as TimestampGranularity[],
+    language: language !== "auto" ? language : undefined,
   };
   
   console.log("Transcription options:", JSON.stringify(transcriptionOptions, (key, value) => {
@@ -133,11 +134,12 @@ export async function transcribeAudio(audioFilePath: string): Promise<unknown> {
   return await groq.audio.transcriptions.create(transcriptionOptions);
 }
 
-export async function fetchAudioFromYouTube(videoURL: string): Promise<{
+export async function fetchAudioFromYouTube(videoURL: string, language: string = "auto"): Promise<{
   title: string;
   transcription: unknown;
 }> {
   console.log("Starting audio download and analysis process for:", videoURL);
+  console.log("Transcription language:", language);
   
   const tempBasePath = generateTempFilePath("youtube-audio");
   let tempFilePath: string | null = null;
@@ -153,7 +155,7 @@ export async function fetchAudioFromYouTube(videoURL: string): Promise<{
     tempFilePath = validateAudioFile(tempFilePath);
     
     console.log("Starting audio transcription...");
-    const transcription = await transcribeAudio(tempFilePath);
+    const transcription = await transcribeAudio(tempFilePath, language);
     console.log("Transcription completed successfully!");
     
     cleanupTempFiles([tempFilePath]);

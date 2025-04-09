@@ -6,8 +6,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
-  const { url } = await req.json();
+  const { url, language } = await req.json();
   console.log("Received URL for analysis:", url);
+  console.log("Requested language for transcription:", language || "auto");
 
   if (!url) {
     return NextResponse.json(
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { title, transcription } = await fetchAudioFromYouTube(url);
+    const { title, transcription } = await fetchAudioFromYouTube(url, language || "auto");
 
     console.log("Analysis completed successfully, returning results");
     return NextResponse.json(
