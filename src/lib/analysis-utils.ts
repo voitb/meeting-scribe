@@ -7,6 +7,16 @@ export type VideoAnalysisResult = {
   keyPoints: string[];
   discussionQuestions: string[];
   videoChapters: VideoChapter[];
+  presentationQuality: {
+    overallClarity: string;
+    difficultSegments: {
+      timeRange: string;
+      issue: string;
+      improvement: string;
+    }[];
+    improvementSuggestions: string[];
+  };
+  glossary: Record<string, string>;
 }
 
 export type VideoChapter = {
@@ -22,7 +32,48 @@ interface ParsedAIResponse {
   discussionQuestions: string[];
   videoChapters?: VideoChapter[];
   videoPoints?: VideoChapter[];
+  glossary?: Record<string, string>;
+  presentationQuality?: {
+    overallClarity: string;
+    difficultSegments: {
+      timeRange: string;
+      issue: string;
+      improvement: string;
+    }[];
+    improvementSuggestions: string[];
+  };
   [key: string]: unknown;
+}
+
+export interface Transcription {
+  task: string;
+  language: string;
+  duration: number;
+  text: string;
+  words: Word[];
+  segments: Segment[];
+  x_groq: {
+      id: string;
+  };
+}
+
+interface Word {
+  word: string;
+  start: number;
+  end: number;
+}
+
+interface Segment {
+  id: number;
+  seek: number;
+  start: number;
+  end: number;
+  text: string;
+  tokens: number[];
+  temperature: number;
+  avg_logprob: number;
+  compression_ratio: number;
+  no_speech_prob: number;
 }
 
 export async function cleanAndParseAIResponse(responseText: string): Promise<ParsedAIResponse> {
@@ -155,7 +206,7 @@ function attemptToFixJsonStructure(jsonString: string): string {
 
 export async function analyzeTranscription(
   title: string, 
-  transcriptionText: string, 
+  transcription: Transcription, 
   outputLanguage: string = "english"
 ): Promise<VideoAnalysisResult> {
   console.log("Starting text analysis with Groq model");
@@ -169,16 +220,32 @@ export async function analyzeTranscription(
   1. A detailed summary of the content (minimum of 20 paragraphs)
   2. A list of 5-7 most important points and concepts
   3. Chapters of the recording with time ranges - divide the recording into logical thematic sections
+  4. Assessment of presentation quality - evaluate clarity, identify difficult segments, suggest improvements
+  5. Glossary of key terms - create a dictionary of important concepts with their definitions
   
-  You need to return exactly these elements in JSON format and stick with this format and format of the following structure:
+  You need to return exactly these elements in JSON format with the following structure:
   {
     "summary": "Here goes the detailed summary...",
     "keyPoints": ["Point 1", "Point 2", ...],
     "videoChapters": [
       {"startTime": "00:00:00", "endTime": "00:02:30", "title": "Introduction", "description": "Brief description of this section"},
       {"startTime": "00:02:31", "endTime": "00:07:45", "title": "Main Concept", "description": "Description of this chapter's content"},
-      {"startTime": "00:07:46", "endTime": "00:12:10", "title": "Practical Example", "description": "Description of the example"}
-    ]
+      {"startTime": "00:07:46", "endTime": "00:12:10", "title": "Practical Example", "description": "Description of the example"},
+      ...
+    ],
+    "presentationQuality": {
+      "overallClarity": "Overall assessment of the speaker's clarity and effectiveness",
+      "difficultSegments": [
+        {"timeRange": "00:05:22-00:06:45", "issue": "Technical jargon without explanation", "improvement": "Could add brief definitions"},
+        {"timeRange": "00:12:30-00:13:20", "issue": "Unclear explanation", "improvement": "Simplify and provide an example"}
+      ],
+      "improvementSuggestions": ["Suggestion 1", "Suggestion 2", ...]
+    },
+    "glossary": {
+      "Term 1": "Definition of term 1 as explained in the transcript at [timestamp]",
+      "Term 2": "Definition of term 2 as explained in the transcript at [timestamp]",
+      ...
+    }
   }
   
   Very important: 
@@ -187,16 +254,40 @@ export async function analyzeTranscription(
   3. Do not include any explanations, markdown formatting like triple backticks, or any text outside the JSON structure.
   4. Ensure all JSON strings are properly escaped.
   
-  Remember that "videoChapters" should divide the entire recording into logical thematic sections, covering the entire duration, with appropriate time ranges from-to. Use the words from the transcription along with their timestamps to determine chapter boundaries.
+  You need to consider the following:
+  In the transcription, I'm providing an array of segments where each segment contains:
+  -"start": the time the segment starts, in seconds
+  -"end": the time the segment ends, in seconds
+  -"text": the text spoken in that segment
+
+  CRITICAL INSTRUCTIONS FOR VIDEO CHAPTERS:
+  - Create substantial, meaningful chapters that represent major topic changes (typically 3-10 minutes long, depending on content)
+  - DO NOT create tiny chapters (e.g., 2-3 seconds) or excessively short chapters
+  - Each chapter must cover a complete thought or topic
+  - Ensure chapters are contiguous and cover the entire video duration (no gaps or overlaps)
+  - Use transcript content and timestamps to accurately determine logical topic transitions
+  - Chapter titles should clearly indicate the main topic/theme of that section
   
-  Transcription:
-  ${transcriptionText}`;
+  "glossary": Extract only terms that are explicitly mentioned and defined in the transcript. Include the exact definitions as presented in the content, with timestamps where possible. Do not invent definitions not present in the source material. Make sure you only extract terms that are hard to understand not something easy like "break" or "pause".
+
+  Transcription (segments):
+  ${JSON.stringify(transcription.segments, null, 2)}
   
-  console.log("Sending request to model with prompt length:", prompt.length);
+  REMEMBER to return the response with ALL fields in the exact JSON format specified:
+  {
+    "summary": "...",
+    "keyPoints": ["...", "..."],
+    "videoChapters": [{"startTime": "...", "endTime": "...", "title": "...", "description": "..."}, ...],
+    "presentationQuality": {"overallClarity": "...", "difficultSegments": [...], "improvementSuggestions": [...]},
+    "glossary": {"Term 1": "Definition 1", "Term 2": "Definition 2", ...}
+  }
+  `;
+  
+  console.log("Prompt:", prompt);
   
   try {
     const { text: analysisResponse } = await generateText({
-      model: groq('qwen-qwq-32b'),
+      model: groq('llama-3.3-70b-versatile'),
       prompt: prompt,
       temperature: 0.4,
     });
@@ -214,7 +305,13 @@ export async function analyzeTranscription(
       summary: parsedResponse.summary || "",
       keyPoints: parsedResponse.keyPoints || [],
       discussionQuestions: parsedResponse.discussionQuestions || [],
-      videoChapters: parsedResponse.videoChapters || []
+      videoChapters: parsedResponse.videoChapters || [],
+      presentationQuality: parsedResponse.presentationQuality || {
+        overallClarity: "",
+        difficultSegments: [],
+        improvementSuggestions: []
+      },
+      glossary: parsedResponse.glossary || {}
     };
   } catch (error) {
     console.error("Error during text analysis:", error);
@@ -224,7 +321,13 @@ export async function analyzeTranscription(
       summary: `An error occurred during transcription analysis: ${error instanceof Error ? error.message : String(error)}`,
       keyPoints: [],
       discussionQuestions: [],
-      videoChapters: []
+      videoChapters: [],
+      presentationQuality: {
+        overallClarity: "",
+        difficultSegments: [],
+        improvementSuggestions: []
+      },
+      glossary: {}
     };
   }
 } 

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     
     const analysisResult = await analyzeTranscription(
       title,
-      transcription.text,
+      transcription,
       outputLanguage
     );
 

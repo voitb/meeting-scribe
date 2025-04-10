@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import PDFDocument from "pdfkit";
 
-async function generatePDFBuffer(title: string, summary: string, keyPoints: string[]): Promise<Buffer> {
+async function generatePDFBuffer(data: {
+  title?: string;
+  summary: string;
+  keyPoints: string[];
+  transcription?: string;
+  videoChapters?: { startTime: string; endTime: string; title: string; description: string }[];
+  presentationQuality?: {
+    overallClarity: string;
+    difficultSegments: { timeRange: string; issue: string; improvement: string }[];
+    improvementSuggestions: string[];
+  };
+  glossary?: Record<string, string>;
+  analysisDate?: string;
+}): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: 'A4', margin: 50 });
@@ -14,31 +27,95 @@ async function generatePDFBuffer(title: string, summary: string, keyPoints: stri
         resolve(pdfBuffer);
       });
 
-      doc
-        .fontSize(20)
-        .text(title, { underline: true });
+      // Title
+      if (data.title) {
+        doc.fontSize(20).text(data.title, { underline: true });
+        doc.moveDown();
+      }
 
+      // Analysis Date
+      if (data.analysisDate) {
+        doc.fontSize(10).text(`Analysis Date: ${data.analysisDate}`, { align: 'right' });
+        doc.moveDown();
+      }
+
+      // Summary
+      doc.fontSize(14).text('Summary:', { underline: true });
       doc.moveDown();
+      doc.fontSize(12).text(data.summary);
+      doc.moveDown(2);
 
-      doc
-        .fontSize(14)
-        .text('Summary:', { underline: true });
-      doc
-        .fontSize(12)
-        .text(summary);
-
+      // Key Points
+      doc.fontSize(14).text('Key Points:', { underline: true });
       doc.moveDown();
-
-      doc
-        .fontSize(14)
-        .text('Key Points:', { underline: true });
-
-      doc.moveDown();
-
-      keyPoints.forEach((point) => {
+      data.keyPoints.forEach((point) => {
         doc.fontSize(12).text(`•  ${point}`);
         doc.moveDown(0.5);
       });
+      doc.moveDown();
+
+      // Video Chapters
+      if (data.videoChapters && data.videoChapters.length > 0) {
+        doc.addPage();
+        doc.fontSize(14).text('Video Chapters:', { underline: true });
+        doc.moveDown();
+        
+        data.videoChapters.forEach((chapter) => {
+          doc.fontSize(12).text(`${chapter.title} (${chapter.startTime} - ${chapter.endTime})`, { underline: true });
+          doc.moveDown(0.5);
+          doc.fontSize(11).text(chapter.description);
+          doc.moveDown();
+        });
+        doc.moveDown();
+      }
+
+      // Presentation Quality
+      if (data.presentationQuality) {
+        doc.addPage();
+        doc.fontSize(14).text('Presentation Quality Assessment:', { underline: true });
+        doc.moveDown();
+        
+        doc.fontSize(12).text('Overall Clarity:');
+        doc.fontSize(11).text(data.presentationQuality.overallClarity);
+        doc.moveDown();
+        
+        if (data.presentationQuality.difficultSegments && data.presentationQuality.difficultSegments.length > 0) {
+          doc.fontSize(12).text('Difficult Segments:');
+          doc.moveDown(0.5);
+          
+          data.presentationQuality.difficultSegments.forEach((segment) => {
+            doc.fontSize(11).text(`Time: ${segment.timeRange}`);
+            doc.fontSize(11).text(`Issue: ${segment.issue}`);
+            doc.fontSize(11).text(`Improvement: ${segment.improvement}`);
+            doc.moveDown(0.5);
+          });
+          doc.moveDown();
+        }
+        
+        if (data.presentationQuality.improvementSuggestions && data.presentationQuality.improvementSuggestions.length > 0) {
+          doc.fontSize(12).text('Improvement Suggestions:');
+          doc.moveDown(0.5);
+          
+          data.presentationQuality.improvementSuggestions.forEach((suggestion) => {
+            doc.fontSize(11).text(`•  ${suggestion}`);
+            doc.moveDown(0.5);
+          });
+        }
+        doc.moveDown();
+      }
+
+      // Glossary
+      if (data.glossary && Object.keys(data.glossary).length > 0) {
+        doc.addPage();
+        doc.fontSize(14).text('Glossary of Key Terms:', { underline: true });
+        doc.moveDown();
+        
+        Object.entries(data.glossary).forEach(([term, definition]) => {
+          doc.fontSize(12).text(term, { underline: true });
+          doc.fontSize(11).text(definition);
+          doc.moveDown();
+        });
+      }
 
       doc.end();
     } catch (err) {
@@ -49,9 +126,8 @@ async function generatePDFBuffer(title: string, summary: string, keyPoints: stri
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, summary, keyPoints } = await req.json();
-
-    const pdfBuffer = await generatePDFBuffer(title, summary, keyPoints);
+    const data = await req.json();
+    const pdfBuffer = await generatePDFBuffer(data);
 
     return new NextResponse(pdfBuffer, {
       headers: {

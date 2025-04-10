@@ -4,11 +4,12 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ResultsContent from "@/components/results-content";
 import { ThemeToggle } from "@/components/theme-toggle";
+import VideoPlayer from "@/components/video-player";
 
 export default async function ResultsPage({
   params,
 }: {
-  params: Promise<{ videoId: string }>;
+  params: { videoId: string };
 }) {
   const { videoId } = await params;
 
@@ -35,14 +36,7 @@ export default async function ResultsPage({
             <h1 className="text-3xl font-bold tracking-tight text-foreground mb-6">
               Learning Materials
             </h1>
-            <div className="aspect-video w-full mb-6 rounded-xl overflow-hidden shadow-lg">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
-                className="w-full h-full"
-                allowFullScreen
-                title="YouTube video"
-              />
-            </div>
+            <VideoPlayer videoId={videoId} />
           </div>
 
           <Suspense
