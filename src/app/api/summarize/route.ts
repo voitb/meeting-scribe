@@ -6,30 +6,18 @@ export async function POST(req: NextRequest) {
   try {
     console.log("Starting POST request processing in /api/summarize");
     const { title, transcription, outputLanguage = "polish" } = await req.json();
-    
-    console.log("Received data:", { 
-      title, 
-      transcriptionLength: transcription?.text?.length || 0,
-      outputLanguage
-    });
      
     if (!transcription.text) {
       throw new Error("No transcription text to analyze");
     }
     
     console.log("Starting transcription analysis...");
-    const analysisStart = Date.now();
-
-    console.log("Transcription text:", transcription.text);
     
     const analysisResult = await analyzeTranscription(
       title,
       transcription,
       outputLanguage
     );
-
-    const analysisTime = Date.now() - analysisStart;
-    console.log(`Analysis completed in ${analysisTime}ms`);
 
     const result: Partial<MediaAnalysisResult> = {
       ...analysisResult,

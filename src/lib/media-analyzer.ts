@@ -1,4 +1,4 @@
-import { VideoAnalysisResult, analyzeTranscription } from "./analysis-utils";
+import { Transcription, VideoAnalysisResult, analyzeTranscription } from "./analysis-utils";
 import { fetchAudioFromYouTube } from "./youtube-audio";
 import { withRetry } from "./file-utils";
 
@@ -73,7 +73,7 @@ export async function analyzeMedia(input: MediaAnalysisInput): Promise<MediaAnal
     }
     
     const analysis = await withRetry(
-      async () => await analyzeTranscription(title, transcriptionText, outputLanguage),
+      async () => await analyzeTranscription(title, transcription as Transcription, outputLanguage),
       {
         operationName: "transcription analysis",
         maxRetries,
@@ -103,6 +103,12 @@ export async function analyzeMedia(input: MediaAnalysisInput): Promise<MediaAnal
       keyPoints: [],
       discussionQuestions: [],
       videoChapters: [],
+      presentationQuality: {
+        overallClarity: "",
+        difficultSegments: [],
+        improvementSuggestions: []
+      },
+      glossary: {},
       sourceUrl,
       analysisDate: new Date().toISOString(),
       status,

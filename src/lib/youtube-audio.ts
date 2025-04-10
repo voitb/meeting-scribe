@@ -126,11 +126,6 @@ export async function transcribeAudio(audioFilePath: string, language: string = 
     language: language !== "auto" ? language : undefined,
   };
   
-  console.log("Transcription options:", JSON.stringify(transcriptionOptions, (key, value) => {
-    if (key === 'file') return audioFilePath;
-    return value;
-  }));
-  
   return await groq.audio.transcriptions.create(transcriptionOptions);
 }
 
@@ -138,16 +133,17 @@ export async function fetchAudioFromYouTube(videoURL: string, language: string =
   title: string;
   transcription: unknown;
 }> {
-  console.log("Starting audio download and analysis process for:", videoURL);
-  console.log("Transcription language:", language);
-  
   const tempBasePath = generateTempFilePath("youtube-audio");
   let tempFilePath: string | null = null;
   
   try {
     const videoInfo = await getVideoInfo(videoURL);
+
+    if(+videoInfo.videoDetails.lengthSeconds > (60 * 5)) {
+      throw new Error("Video is too long");
+    }
+    
     const videoTitle = videoInfo.videoDetails.title;
-    console.log("Video title:", videoTitle);
     
     tempFilePath = await downloadYouTubeAudio(videoURL, tempBasePath);
     console.log("Audio download completed successfully, file:", tempFilePath);

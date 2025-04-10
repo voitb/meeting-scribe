@@ -9,7 +9,7 @@ import VideoPlayer from "@/components/video-player";
 export default async function ResultsPage({
   params,
 }: {
-  params: { videoId: string };
+  params: Promise<{ videoId: string }>;
 }) {
   const { videoId } = await params;
 
@@ -19,8 +19,8 @@ export default async function ResultsPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <header className="flex justify-between items-center mb-8">
+      <div className="container mx-auto pt-4 pb-2 py-8">
+        <header className="flex justify-between items-center fixed w-full left-0 px-20 py-2 ">
           <Link
             href="/"
             className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
@@ -32,10 +32,7 @@ export default async function ResultsPage({
         </header>
 
         <div className="max-w-5xl mx-auto">
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-6">
-              Learning Materials
-            </h1>
+          <div>
             <VideoPlayer videoId={videoId} />
           </div>
 

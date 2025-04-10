@@ -1,5 +1,5 @@
 import { groq } from '@ai-sdk/groq';
-import { generateText } from 'ai';
+import { generateText } from 'ai'; 
 
 export type VideoAnalysisResult = {
   title: string;
@@ -79,7 +79,7 @@ interface Segment {
 export async function cleanAndParseAIResponse(responseText: string): Promise<ParsedAIResponse> {
   let cleanedResponse = responseText;
   
-  const extractJsonBlock = (text: string): string => {
+  const extractJsonBlock = (text: string): string => { 
     const startIndex = text.indexOf('{');
     const endIndex = text.lastIndexOf('}');
     
@@ -212,78 +212,86 @@ export async function analyzeTranscription(
   console.log("Starting text analysis with Groq model");
 
   const prompt = `You are an expert in analyzing lectures and podcasts, creating high-quality educational materials.
-    
+
   Below is a transcription of a recording titled "${title}".
-  
-  Analyze this transcription and prepare:
-  
-  1. A detailed summary of the content (minimum of 20 paragraphs)
-  2. A list of 5-7 most important points and concepts
-  3. Chapters of the recording with time ranges - divide the recording into logical thematic sections
-  4. Assessment of presentation quality - evaluate clarity, identify difficult segments, suggest improvements
-  5. Glossary of key terms - create a dictionary of important concepts with their definitions
-  
-  You need to return exactly these elements in JSON format with the following structure:
+
+  IMPORTANT - CRUCIAL INFORMATION ABOUT TIME FORMAT:
+  - In the transcription, times are given in SECONDS.
+  - In your response, times must be in the "hh:mm:ss" format.
+  - Every numeric value in the "start" and "end" fields represents seconds. You must convert them into hours, minutes, and seconds in the "hh:mm:ss" format.
+  - Conversion examples:
+    - 90 seconds = "00:01:30" (not "00:90:00")
+    - 3661 seconds = "01:01:01"
+
+  Your task is to:
+
+  1. Provide a detailed summary of the recording (at least 30 sentences, at most 50 sentences).
+  2. List 5-7 most important points and concepts.
+  3. Divide the recording into MEANINGFUL CHAPTERS (5-10 chapters maximum) with time ranges in "hh:mm:ss" format, a title, and a short description. Each chapter MUST cover substantial content (at least several minutes in length). They must fully cover the material from "00:00:00" to the end without gaps between chapters.
+  4. Assess the presentation quality:
+    - How would you rate the clarity of the content?
+    - Identify up to 5 difficult segments (with time ranges "hh:mm:ss-hh:mm:ss") and propose how they could be improved.
+    - Provide general suggestions for improving presentation quality.
+  5. Create a glossary of key terms - list more complex concepts that were actually defined in the transcript. Include the approximate time (in "hh:mm:ss" format) of where the definition appears in the recording, along with a brief explanation.
+
+  CRITICAL INSTRUCTIONS FOR VIDEO CHAPTERS - READ CAREFULLY:
+  - Each chapter MUST be AT LEAST 2-3 MINUTES LONG, preferably longer (5-15 minutes) for substantive topics.
+  - NEVER create chapters shorter than 2 minutes - these are TOO SHORT to be useful.
+  - Chapters should represent MAJOR THEMATIC SECTIONS where the speaker discusses a cohesive topic or concept.
+  - Focus on creating meaningful, substantive chapters that give viewers clear navigation points.
+  - The goal is to create a helpful outline of the content, not timestamp every small statement.
+  - If the content is short, create fewer chapters but ensure each covers a complete thought or topic.
+  - Each chapter should have a descriptive title and a concise summary in ${outputLanguage}.
+  - The start and end times of each chapter must be converted from seconds to "hh:mm:ss."
+
+  GLOSSARY:
+  - List ONLY the terms that are actually defined or explained in detail within the recording.
+  - Do not add definitions not found in the source material.
+  - Example: "Term 1": "Definition of term 1 mentioned around [timestamp]".
+
+  Finally, return your answer in exactly this JSON structure (with no additional descriptions, comments, tags, or text outside the JSON). Make sure everything is properly nested and there are no extra characters. Here is the template:
+
   {
-    "summary": "Here goes the detailed summary...",
+    "summary": "Insert your detailed summary here...",
     "keyPoints": ["Point 1", "Point 2", ...],
     "videoChapters": [
-      {"startTime": "00:00:00", "endTime": "00:02:30", "title": "Introduction", "description": "Brief description of this section"},
-      {"startTime": "00:02:31", "endTime": "00:07:45", "title": "Main Concept", "description": "Description of this chapter's content"},
-      {"startTime": "00:07:46", "endTime": "00:12:10", "title": "Practical Example", "description": "Description of the example"},
+      {
+        "startTime": "hh:mm:ss",
+        "endTime": "hh:mm:ss",
+        "title": "Chapter Title",
+        "description": "Brief description of the chapter"
+      },
       ...
     ],
     "presentationQuality": {
-      "overallClarity": "Overall assessment of the speaker's clarity and effectiveness",
+      "overallClarity": "Overall assessment of clarity and effectiveness",
       "difficultSegments": [
-        {"timeRange": "00:05:22-00:06:45", "issue": "Technical jargon without explanation", "improvement": "Could add brief definitions"},
-        {"timeRange": "00:12:30-00:13:20", "issue": "Unclear explanation", "improvement": "Simplify and provide an example"}
+        {
+          "timeRange": "hh:mm:ss-hh:mm:ss",
+          "issue": "Issue description, e.g., technical jargon without explanation",
+          "improvement": "Suggested improvement"
+        },
+        ...
       ],
       "improvementSuggestions": ["Suggestion 1", "Suggestion 2", ...]
     },
     "glossary": {
-      "Term 1": "Definition of term 1 as explained in the transcript at [timestamp]",
-      "Term 2": "Definition of term 2 as explained in the transcript at [timestamp]",
-      ...
+      "Term 1": "Definition of term 1 along with approximate timestamp...",
+      "Term 2": "Definition of term 2 along with approximate timestamp..."
     }
   }
-  
-  Very important: 
-  1. Your response must be in ${outputLanguage} language.
-  2. Respond ONLY with valid JSON in the exact format specified above.
-  3. Do not include any explanations, markdown formatting like triple backticks, or any text outside the JSON structure.
-  4. Ensure all JSON strings are properly escaped.
-  
-  You need to consider the following:
-  In the transcription, I'm providing an array of segments where each segment contains:
-  -"start": the time the segment starts, in seconds
-  -"end": the time the segment ends, in seconds
-  -"text": the text spoken in that segment
-
-  CRITICAL INSTRUCTIONS FOR VIDEO CHAPTERS:
-  - Create substantial, meaningful chapters that represent major topic changes (typically 3-10 minutes long, depending on content)
-  - DO NOT create tiny chapters (e.g., 2-3 seconds) or excessively short chapters
-  - Each chapter must cover a complete thought or topic
-  - Ensure chapters are contiguous and cover the entire video duration (no gaps or overlaps)
-  - Use transcript content and timestamps to accurately determine logical topic transitions
-  - Chapter titles should clearly indicate the main topic/theme of that section
-  
-  "glossary": Extract only terms that are explicitly mentioned and defined in the transcript. Include the exact definitions as presented in the content, with timestamps where possible. Do not invent definitions not present in the source material. Make sure you only extract terms that are hard to understand not something easy like "break" or "pause".
 
   Transcription (segments):
+  \`\`\`
   ${JSON.stringify(transcription.segments, null, 2)}
-  
-  REMEMBER to return the response with ALL fields in the exact JSON format specified:
-  {
-    "summary": "...",
-    "keyPoints": ["...", "..."],
-    "videoChapters": [{"startTime": "...", "endTime": "...", "title": "...", "description": "..."}, ...],
-    "presentationQuality": {"overallClarity": "...", "difficultSegments": [...], "improvementSuggestions": [...]},
-    "glossary": {"Term 1": "Definition 1", "Term 2": "Definition 2", ...}
-  }
+  \`\`\`
+
+  Remember:
+  1. Your answer must be in the ${outputLanguage} language.
+  2. Respond only with valid JSON in the specified format (no additional explanations, comments, or markers).
+  3. Ensure all times given in seconds are correctly converted to the "hh:mm:ss" format.
+  4. MOST IMPORTANT: Create SUBSTANTIVE CHAPTERS (at least several minutes long each) that properly segment the content. SHORT CHAPTERS (seconds or 1 minute) ARE NOT ACCEPTABLE.
   `;
-  
-  console.log("Prompt:", prompt);
   
   try {
     const { text: analysisResponse } = await generateText({
@@ -297,8 +305,6 @@ export async function analyzeTranscription(
     if(!parsedResponse) {
       throw new Error("Invalid response from model");
     }
-
-    console.log("Processed response structure:", Object.keys(parsedResponse));
     
     return {
       title,

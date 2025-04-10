@@ -7,9 +7,7 @@ export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
   const { url, language } = await req.json();
-  console.log("Received URL for analysis:", url);
-  console.log("Requested language for transcription:", language || "auto");
-
+  
   if (!url) {
     return NextResponse.json(
       { error: "Missing YouTube URL" },
