@@ -1,5 +1,5 @@
 import fs from "fs";
-import ytdl from "@distube/ytdl-core";
+import ytdl, { MoreVideoDetails } from "@distube/ytdl-core";
 import Groq from "groq-sdk";
 import { withRetry, cleanupTempFiles, validateAudioFile, generateTempFilePath } from "./file-utils";
 
@@ -130,7 +130,7 @@ export async function transcribeAudio(audioFilePath: string, language: string = 
 }
 
 export async function fetchAudioFromYouTube(videoURL: string, language: string = "auto"): Promise<{
-  title: string;
+  videoDetails: MoreVideoDetails;
   transcription: unknown;
 }> {
   const tempBasePath = generateTempFilePath("youtube-audio");
@@ -138,12 +138,12 @@ export async function fetchAudioFromYouTube(videoURL: string, language: string =
   
   try {
     const videoInfo = await getVideoInfo(videoURL);
+    const {videoDetails} = videoInfo;
 
-    if(+videoInfo.videoDetails.lengthSeconds > (60 * 5)) {
+    if(+videoDetails.lengthSeconds > (60 * 5)) {
       throw new Error("Video is too long");
     }
     
-    const videoTitle = videoInfo.videoDetails.title;
     
     tempFilePath = await downloadYouTubeAudio(videoURL, tempBasePath);
     console.log("Audio download completed successfully, file:", tempFilePath);
@@ -157,7 +157,7 @@ export async function fetchAudioFromYouTube(videoURL: string, language: string =
     cleanupTempFiles([tempFilePath]);
     
     return { 
-      title: videoTitle,
+      videoDetails,
       transcription 
     };
   } catch (error) {

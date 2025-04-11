@@ -5,6 +5,7 @@ import VideoForm from "@/components/video-form";
 import { HeroSection } from "@/components/sections/hero-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { FeaturesSection } from "@/components/sections/features-section";
+import { RecentVideosSection } from "@/components/sections/recent-videos-section";
 
 export default function Home() {
   return (
@@ -31,6 +32,15 @@ export default function Home() {
 
           <div className="mt-24 space-y-16">
             <HowItWorksSection />
+            <Suspense
+              fallback={
+                <div className="h-20 flex items-center justify-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              }
+            >
+              <RecentVideosSection />
+            </Suspense>
             <FeaturesSection />
           </div>
         </div>

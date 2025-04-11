@@ -4,8 +4,7 @@ import { Clock } from "lucide-react";
 
 export interface VideoChapter {
   startTime: string; // Format: "00:00:00"
-  endTime?: string; // Format: "00:00:00" (might be "endtime" in some data)
-  endtime?: string; // Alternative field name
+  endTime?: string; // Format: "00:00:00"
   title: string;
   description: string;
 }
@@ -58,7 +57,7 @@ export function VideoChapters({
       </h3>
       <div className="space-y-3">
         {chapters.map((chapter, index) => {
-          const endTime = chapter.endTime || chapter.endtime;
+          const endTime = chapter.endTime;
           const duration = endTime
             ? formatDuration(chapter.startTime, endTime)
             : "";

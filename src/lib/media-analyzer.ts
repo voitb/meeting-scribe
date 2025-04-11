@@ -53,7 +53,7 @@ export async function analyzeMedia(input: MediaAnalysisInput): Promise<MediaAnal
     status = MediaAnalysisStatus.DOWNLOADING;
     console.log(`[Media Analyzer] Starting audio download from: ${sourceUrl}`);
     
-    const { title, transcription } = await withRetry(
+    const { videoDetails: {title}, transcription } = await withRetry(
       async () => await fetchAudioFromYouTube(sourceUrl, transcriptionLanguage),
       {
         operationName: "audio download and transcription",
@@ -100,8 +100,7 @@ export async function analyzeMedia(input: MediaAnalysisInput): Promise<MediaAnal
     return {
       title: "",
       summary: "",
-      keyPoints: [],
-      discussionQuestions: [],
+      keyPoints: [], 
       videoChapters: [],
       presentationQuality: {
         overallClarity: "",

@@ -5,7 +5,7 @@ import { MediaAnalysisResult } from "@/lib/media-analyzer";
 export async function POST(req: NextRequest) {
   try {
     console.log("Starting POST request processing in /api/summarize");
-    const { title, transcription, outputLanguage = "polish" } = await req.json();
+    const { videoDetails: {title}, transcription, outputLanguage = "polish" } = await req.json();
      
     if (!transcription.text) {
       throw new Error("No transcription text to analyze");

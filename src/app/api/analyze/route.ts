@@ -16,12 +16,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { title, transcription } = await fetchAudioFromYouTube(url, language || "auto");
+    const { videoDetails, transcription } = await fetchAudioFromYouTube(url, language || "auto");
 
     console.log("Analysis completed successfully, returning results");
     return NextResponse.json(
       {
-        title,
+        videoDetails,
         transcription: transcription
       },
       {

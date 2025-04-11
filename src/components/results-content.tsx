@@ -9,6 +9,9 @@ import { useSearchParams } from "next/navigation";
 import type { VideoChapter } from "./video-chapters";
 import ResultsTabs from "./results-tab";
 import { ProgressCards } from "./progress-cards";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { thumbnail } from "@distube/ytdl-core";
 
 export interface DifficultSegment {
   timeRange: string;
@@ -24,14 +27,25 @@ export interface PresentationQuality {
 
 export interface AnalysisResult {
   title?: string;
+  thumbnail?: string;
   summary: string;
   keyPoints: string[];
-  discussionQuestions: string[];
-  transcription?: string;
   videoChapters?: VideoChapter[];
   presentationQuality?: PresentationQuality;
   glossary?: Record<string, string>;
   analysisDate?: string;
+}
+
+function getThumbnailUrl(thumbnails: thumbnail[]): string {
+  if (thumbnails && thumbnails.length > 0) {
+    const sortedThumbnails = [...thumbnails].sort(
+      (a, b) => b.width * b.height - a.width * a.height
+    );
+
+    return sortedThumbnails[0].url;
+  }
+
+  return "";
 }
 
 export default function ResultsContent({ videoId }: { videoId: string }) {
@@ -45,8 +59,48 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
 
   // Get language from URL query parameter, default to Polish if not provided
   const outputLanguage = searchParams.get("lang") || "polish";
+  const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // Sprawdzenie czy wideo istnieje już w bazie danych
+  const existingVideo = useQuery(api.videos.getVideoAnalysis, {
+    url: youtubeUrl,
+  });
+
+  // Mutacja do dodawania nowej analizy wideo
+  const addVideoAnalysis = useMutation(api.videos.addVideoAnalysis);
+
+  console.log({ existingVideo });
 
   useEffect(() => {
+    if (existingVideo === undefined) {
+      return;
+    }
+
+    if (existingVideo) {
+      setCurrentStep(3);
+
+      const finalResult: AnalysisResult = {
+        title: existingVideo.title,
+        thumbnail: existingVideo.thumbnail,
+        summary: existingVideo.summary,
+        keyPoints: existingVideo.keyPoints,
+        videoChapters: existingVideo.videoChapters,
+        presentationQuality: existingVideo.presentationQuality,
+        glossary: existingVideo.glossary,
+        analysisDate: existingVideo.analysisDate,
+      };
+
+      setResult(finalResult);
+
+      setTimeout(() => {
+        setShowResults(true);
+        setProcessing(false);
+        toast.success("Analysis already exists!");
+      }, 1000);
+
+      return;
+    }
+
     const processVideo = async () => {
       try {
         // Reset state
@@ -59,7 +113,6 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
         // Step 1: Download audio and transcribe
         setCurrentStep(0); // First step (25%)
 
-        const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
         const transcriptionResponse = await fetch("/api/analyze", {
           method: "POST",
           headers: {
@@ -105,14 +158,13 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
 
         // Step 4: Complete
         setCurrentStep(3); // Final step (100%)
-        console.log({ analysisData });
+        console.log({ transcriptionData, analysisData });
         // Prepare the result
         const finalResult = {
-          title: transcriptionData.title,
+          title: transcriptionData.videoDetails.title,
+          thumbnail: getThumbnailUrl(transcriptionData.videoDetails.thumbnails),
           summary: analysisData.summary,
           keyPoints: analysisData.keyPoints,
-          discussionQuestions: analysisData.discussionQuestions,
-          transcription: transcriptionData.transcription,
           videoChapters: analysisData.videoChapters,
           presentationQuality: analysisData.presentationQuality,
           glossary: analysisData.glossary,
@@ -120,6 +172,21 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
         };
 
         setResult(finalResult);
+
+        try {
+          await addVideoAnalysis({
+            url: youtubeUrl,
+            ...finalResult,
+          });
+
+          console.log("Analiza została zapisana w bazie danych");
+        } catch (dbError) {
+          console.error(
+            "Błąd podczas zapisywania analizy w bazie danych:",
+            dbError
+          );
+          // Nie przerywamy działania aplikacji, jeśli zapis do bazy się nie powiedzie
+        }
 
         // Show completion card for 2 seconds before showing results
         setTimeout(() => {
@@ -138,7 +205,7 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
     };
 
     processVideo();
-  }, [videoId, outputLanguage]);
+  }, [videoId, outputLanguage, existingVideo, youtubeUrl, addVideoAnalysis]);
 
   if (processing && !showResults) {
     return (
@@ -187,9 +254,9 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
           <h2 className="text-2xl font-semibold text-foreground">
             Generated Educational Materials
           </h2>
-          <div className="text-sm px-3 py-1 bg-accent/10 rounded-full ">
+          {/* <div className="text-sm px-3 py-1 bg-accent/10 rounded-full ">
             {outputLanguage.charAt(0).toUpperCase() + outputLanguage.slice(1)}
-          </div>
+          </div> */}
         </div>
         <ResultsTabs result={result} />
       </motion.div>

@@ -5,7 +5,6 @@ export type VideoAnalysisResult = {
   title: string;
   summary: string;
   keyPoints: string[];
-  discussionQuestions: string[];
   videoChapters: VideoChapter[];
   presentationQuality: {
     overallClarity: string;
@@ -310,7 +309,6 @@ export async function analyzeTranscription(
       title,
       summary: parsedResponse.summary || "",
       keyPoints: parsedResponse.keyPoints || [],
-      discussionQuestions: parsedResponse.discussionQuestions || [],
       videoChapters: parsedResponse.videoChapters || [],
       presentationQuality: parsedResponse.presentationQuality || {
         overallClarity: "",
@@ -326,7 +324,6 @@ export async function analyzeTranscription(
       title,
       summary: `An error occurred during transcription analysis: ${error instanceof Error ? error.message : String(error)}`,
       keyPoints: [],
-      discussionQuestions: [],
       videoChapters: [],
       presentationQuality: {
         overallClarity: "",

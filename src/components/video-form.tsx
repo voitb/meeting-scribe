@@ -9,19 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Youtube } from "lucide-react";
 import { extractVideoId } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { AnimatedFormWrapper } from "./animated-form-wrapper";
 
 export default function VideoForm() {
   const [url, setUrl] = useState("");
-  const [language, setLanguage] = useState("english");
+  const [
+    language,
+    // , setLanguage
+  ] = useState("english");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -103,7 +106,7 @@ export default function VideoForm() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
                   >
-                    <Select
+                    {/* <Select
                       value={language}
                       onValueChange={setLanguage}
                       disabled={isLoading}
@@ -125,7 +128,7 @@ export default function VideoForm() {
                           Italian (Italiano)
                         </SelectItem>
                       </SelectContent>
-                    </Select>
+                    </Select> */}
                   </motion.div>
 
                   <motion.div
