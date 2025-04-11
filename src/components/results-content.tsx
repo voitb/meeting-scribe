@@ -14,7 +14,8 @@ import { api } from "../../convex/_generated/api";
 import { thumbnail } from "@distube/ytdl-core";
 
 export interface DifficultSegment {
-  timeRange: string;
+  startTime: string;
+  endTime: string;
   issue: string;
   improvement: string;
 }

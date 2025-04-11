@@ -9,7 +9,8 @@ export type VideoAnalysisResult = {
   presentationQuality: {
     overallClarity: string;
     difficultSegments: {
-      timeRange: string;
+      startTime: string;
+      endTime: string;
       issue: string;
       improvement: string;
     }[];
@@ -35,7 +36,8 @@ interface ParsedAIResponse {
   presentationQuality?: {
     overallClarity: string;
     difficultSegments: {
-      timeRange: string;
+      startTime: string;
+      endTime: string;
       issue: string;
       improvement: string;
     }[];
@@ -210,91 +212,90 @@ export async function analyzeTranscription(
 ): Promise<VideoAnalysisResult> {
   console.log("Starting text analysis with Groq model");
 
-  const prompt = `You are an expert in analyzing lectures and podcasts, creating high-quality educational materials.
+  const prompt = `
+You are an expert in analyzing lectures and podcasts, creating high-quality educational materials.
 
-  Below is a transcription of a recording titled "${title}".
+IMPORTANT – TIME FORMAT (hh:mm:ss):
+1. In the transcription, time is given in seconds.
+2. In your final answer, all "startTime" and "endTime" values MUST be in the "hh:mm:ss" format (hours:minutes:seconds).
+3. Convert the original seconds from the transcription exactly into hh:mm:ss (no rounding, no shortening).
 
-  IMPORTANT - CRUCIAL INFORMATION ABOUT TIME FORMAT:
-  - In the transcription, times are given in SECONDS.
-  - In your response, times must be in the "hh:mm:ss" format.
-  - Every numeric value in the "start" and "end" fields represents seconds. You must convert them into hours, minutes, and seconds in the "hh:mm:ss" format.
-  - Conversion examples:
-    - 90 seconds = "00:01:30" (not "00:90:00")
-    - 3661 seconds = "01:01:01"
+Your task:
 
-  Your task is to:
+1. **Provide a detailed summary** of the recording (between 30 and 50 sentences).
+2. **List 5-7 key points** or concepts discussed in the material.
+3. **Divide the recording into 5-10 chapters** ("videoChapters") covering the entire content from "00:00:00" to the last second of the recording:
+   - Each chapter MUST last at least 2-3 minutes (preferably 5-15 minutes).
+   - Chapters should represent major, coherent topics (avoid very short sections).
+   - Calculate the "startTime" and "endTime" of the chapters from the segment "start" and "end" times (in seconds) provided in the transcription — then convert them to hh:mm:ss.
+   - Make sure the chapters together cover the entire time range (from "00:00:00" to the maximum end time), with no gaps.
 
-  1. Provide a detailed summary of the recording (at least 30 sentences, at most 50 sentences).
-  2. List 5-7 most important points and concepts.
-  3. Divide the recording into MEANINGFUL CHAPTERS (5-10 chapters maximum) with time ranges in "hh:mm:ss" format, a title, and a short description. Each chapter MUST cover substantial content (at least several minutes in length). They must fully cover the material from "00:00:00" to the end without gaps between chapters.
-  4. Assess the presentation quality:
-    - How would you rate the clarity of the content?
-    - Identify up to 5 difficult segments (with time ranges "hh:mm:ss-hh:mm:ss") and propose how they could be improved.
-    - Provide general suggestions for improving presentation quality.
-  5. Create a glossary of key terms - list more complex concepts that were actually defined in the transcript. Include the approximate time (in "hh:mm:ss" format) of where the definition appears in the recording, along with a brief explanation.
+4. **Assess the presentation quality**:
+   - Provide an overall assessment of clarity (overallClarity).
+   - Identify up to 5 challenging segments (provide their time ranges in hh:mm:ss), describe the issue (issue), and propose an improvement (improvement).
+   - Add general suggestions (improvementSuggestions) for enhancing the presentation.
 
-  CRITICAL INSTRUCTIONS FOR VIDEO CHAPTERS - READ CAREFULLY:
-  - Each chapter MUST be AT LEAST 2-3 MINUTES LONG, preferably longer (5-15 minutes) for substantive topics.
-  - NEVER create chapters shorter than 2 minutes - these are TOO SHORT to be useful.
-  - Chapters should represent MAJOR THEMATIC SECTIONS where the speaker discusses a cohesive topic or concept.
-  - Focus on creating meaningful, substantive chapters that give viewers clear navigation points.
-  - The goal is to create a helpful outline of the content, not timestamp every small statement.
-  - If the content is short, create fewer chapters but ensure each covers a complete thought or topic.
-  - Each chapter should have a descriptive title and a concise summary in ${outputLanguage}.
-  - The start and end times of each chapter must be converted from seconds to "hh:mm:ss."
+5. **Create a glossary (glossary)**:
+   - List ONLY the terms that are actually defined or explained in the recording.
+   - For each term, provide a short explanation/definition and the approximate time (hh:mm:ss) where the explanation appears.
 
-  GLOSSARY:
-  - List ONLY the terms that are actually defined or explained in detail within the recording.
-  - Do not add definitions not found in the source material.
-  - Example: "Term 1": "Definition of term 1 mentioned around [timestamp]".
+**NOTE**: In your response, **only** return a properly formatted JSON object, with no additional markings. The structure must look exactly like this (use your own content within the keys):
 
-  Finally, return your answer in exactly this JSON structure (with no additional descriptions, comments, tags, or text outside the JSON). Make sure everything is properly nested and there are no extra characters. Here is the template:
-
-  {
-    "summary": "Insert your detailed summary here...",
-    "keyPoints": ["Point 1", "Point 2", ...],
-    "videoChapters": [
+{
+  "summary": "Place your detailed summary here...",
+  "keyPoints": [
+    "Key point 1",
+    "Key point 2",
+    ...
+  ],
+  "videoChapters": [
+    {
+      "startTime": "00:00:00",
+      "endTime": "00:10:00",
+      "title": "Chapter title",
+      "description": "Short description"
+    },
+    ...
+  ],
+  "presentationQuality": {
+    "overallClarity": "Overall assessment of clarity and effectiveness",
+    "difficultSegments": [
       {
-        "startTime": "hh:mm:ss",
-        "endTime": "hh:mm:ss",
-        "title": "Chapter Title",
-        "description": "Brief description of the chapter"
+        "startTime": "00:00:00",
+        "endTime": "00:03:00",
+        "issue": "Issue description",
+        "improvement": "Suggested improvement"
       },
       ...
     ],
-    "presentationQuality": {
-      "overallClarity": "Overall assessment of clarity and effectiveness",
-      "difficultSegments": [
-        {
-          "timeRange": "hh:mm:ss-hh:mm:ss",
-          "issue": "Issue description, e.g., technical jargon without explanation",
-          "improvement": "Suggested improvement"
-        },
-        ...
-      ],
-      "improvementSuggestions": ["Suggestion 1", "Suggestion 2", ...]
-    },
-    "glossary": {
-      "Term 1": "Definition of term 1 along with approximate timestamp...",
-      "Term 2": "Definition of term 2 along with approximate timestamp..."
-    }
+    "improvementSuggestions": [
+      "Suggestion 1",
+      "Suggestion 2",
+      ...
+    ]
+  },
+  "glossary": {
+    "Term 1": "Definition + approximate time (hh:mm:ss)",
+    "Term 2": "Definition + approximate time (hh:mm:ss)"
   }
+}
 
-  Transcription (segments):
-  \`\`\`
-  ${JSON.stringify(transcription.segments, null, 2)}
-  \`\`\`
+Remember:
+- No other tags, text, or comments - just JSON.
+- Every "startTime" and "endTime" must correspond exactly to the original segment's seconds, converted to hh:mm:ss.
+- When creating the chapters, pay special attention to the minimum duration of 2-3 minutes.
+- For instance, if a segment shows start: 125 → "00:02:05" and end: 368 → "00:06:08", preserve those exact values, unchanged.
+- Values in the "startTime" and "endTime" keys must be in the "hh:mm:ss" format (hours, minutes, seconds) and SHOULD BE BASED ON VALID SEGMENT TIMES. BE SURE THE VALUES ARE NOT ROUNDED OR SHORTENED OR EVEN MISSED OR SKIPPED OR BAD OR INCORRECT. IF IT's SECONDS THEN IT'S SECONDS. IF IT's MINUTES THEN IT's MINUTES. IF IT's HOURS THEN IT's HOURS. 
+- BE SURE THAT EVERYTHING HAS CORRECT ASCII, NO OTHER THAN ENGLISH LANGUAGE, NO OTHER NOT ENGLISH LANGUAGE. NOT ANY INVALID CHARACTERS THAT WOULD BREAK THE JSON FORMAT.
+Here is the transcription of the recording (segments in seconds):
+${JSON.stringify(transcription.segments, null, 2)}
 
-  Remember:
-  1. Your answer must be in the ${outputLanguage} language.
-  2. Respond only with valid JSON in the specified format (no additional explanations, comments, or markers).
-  3. Ensure all times given in seconds are correctly converted to the "hh:mm:ss" format.
-  4. MOST IMPORTANT: Create SUBSTANTIVE CHAPTERS (at least several minutes long each) that properly segment the content. SHORT CHAPTERS (seconds or 1 minute) ARE NOT ACCEPTABLE.
-  `;
+Be sure to fill in all the required elements (summary, key points, chapters, quality assessment, glossary) and answer in ${outputLanguage}.
+`;
   
   try {
     const { text: analysisResponse } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
+      model: groq('llama-3.3-70b-specdec'),
       prompt: prompt,
       temperature: 0.4,
     });

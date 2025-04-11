@@ -19,7 +19,8 @@ export default defineSchema({
     presentationQuality: v.object({
       overallClarity: v.string(),
       difficultSegments: v.array(v.object({
-          timeRange: v.string(),
+        startTime: v.string(),
+        endTime: v.string(),  
           issue: v.string(),
           improvement: v.string(),
       })),

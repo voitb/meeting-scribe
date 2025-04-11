@@ -12,7 +12,6 @@ export default function PresentationQualityView({
   quality,
   onSegmentClick,
 }: PresentationQualityViewProps) {
-  // Convert time range (00:00:00-00:00:00) to seconds for the start time
   const timeRangeToSeconds = (timeRange: string): number => {
     const startTime = timeRange.split("-")[0];
     const parts = startTime.split(":").map(Number);
@@ -53,11 +52,16 @@ export default function PresentationQualityView({
                   </div>
                   <button
                     onClick={() =>
-                      onSegmentClick(timeRangeToSeconds(segment.timeRange))
+                      onSegmentClick(
+                        timeRangeToSeconds(
+                          `${segment.startTime} - ${segment.endTime}`
+                        )
+                      )
                     }
                     className="text-sm font-mono hover:underline flex items-center"
                   >
-                    {segment.timeRange} <ArrowRight className="h-3 w-3 ml-1" />
+                    {segment.startTime} - {segment.endTime}{" "}
+                    <ArrowRight className="h-3 w-3 ml-1" />
                   </button>
                 </div>
                 <div className="p-4">
