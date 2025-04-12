@@ -5,7 +5,7 @@ import { fetchAudioFromYouTube } from "@/lib/youtube-audio";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const { url, language } = await req.json();
   
   if (!url) {
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 400 }
     );
   }
-  const responseHeaders = new Headers(res.headers);
+  const responseHeaders = new Headers();
 
   const randomName = Math.random().toString(36).substring(2, 15);
 
