@@ -22,11 +22,14 @@ export async function POST(req: NextRequest) {
     "Content-Disposition",
     `attachment; filename="${randomName}.mp4"`,
   );
+  
+  responseHeaders.set('Content-Type', 'audio/mp4')
 
   responseHeaders.set(
     "User-Agent",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
   );
+
 
   try {
     const { videoDetails, transcription } = await fetchAudioFromYouTube(url, language || "auto");
