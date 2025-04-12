@@ -70,8 +70,6 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
   // Mutacja do dodawania nowej analizy wideo
   const addVideoAnalysis = useMutation(api.videos.addVideoAnalysis);
 
-  console.log({ existingVideo });
-
   useEffect(() => {
     if (existingVideo === undefined) {
       return;
@@ -159,7 +157,6 @@ export default function ResultsContent({ videoId }: { videoId: string }) {
 
         // Step 4: Complete
         setCurrentStep(3); // Final step (100%)
-        console.log({ transcriptionData, analysisData });
         // Prepare the result
         const finalResult = {
           title: transcriptionData.videoDetails.title,

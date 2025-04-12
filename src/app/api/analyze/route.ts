@@ -38,11 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         transcription: transcription
       },
       {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-        }
+        headers: responseHeaders
       }
     );
   } catch (error) {
