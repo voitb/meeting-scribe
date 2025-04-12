@@ -26,14 +26,11 @@ export default function VideoPlayer({ videoId }: { videoId: string }) {
       }
     };
 
-    window.addEventListener(
-      "seek-video" as any,
-      handleSeekEvent as EventListener
-    );
+    window.addEventListener("seek-video", handleSeekEvent as EventListener);
 
     return () => {
       window.removeEventListener(
-        "seek-video" as any,
+        "seek-video",
         handleSeekEvent as EventListener
       );
     };

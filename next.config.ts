@@ -4,7 +4,7 @@ const nextConfig = {
   serverExternalPackages: ["pdfkit"],
   images: {
     domains: ['i.ytimg.com'],
-  },
+  } 
 };
 
 export default nextConfig;

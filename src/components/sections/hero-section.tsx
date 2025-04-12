@@ -14,17 +14,6 @@ export function HeroSection() {
 
   if (!mounted) return null;
 
-  const pulseVariants = {
-    pulse: {
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 2,
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: "reverse",
-      },
-    },
-  };
-
   return (
     <motion.div
       className="text-center mb-16"

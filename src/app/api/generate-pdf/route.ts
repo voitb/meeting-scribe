@@ -56,7 +56,6 @@ async function generatePDFBuffer(data: {
 
       // Video Chapters
       if (data.videoChapters && data.videoChapters.length > 0) {
-        doc.addPage();
         doc.fontSize(14).text('Video Chapters:', { underline: true });
         doc.moveDown();
         
@@ -71,7 +70,6 @@ async function generatePDFBuffer(data: {
 
       // Presentation Quality
       if (data.presentationQuality) {
-        doc.addPage();
         doc.fontSize(14).text('Presentation Quality Assessment:', { underline: true });
         doc.moveDown();
         
@@ -106,7 +104,6 @@ async function generatePDFBuffer(data: {
 
       // Glossary
       if (data.glossary && Object.keys(data.glossary).length > 0) {
-        doc.addPage();
         doc.fontSize(14).text('Glossary of Key Terms:', { underline: true });
         doc.moveDown();
         
