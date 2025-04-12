@@ -11,18 +11,36 @@ export type ResponseFormat = "verbose_json" | "json" | "text";
 export type TimestampGranularity = "word" | "segment";
 
 export async function getVideoInfo(videoURL: string): Promise<ytdl.videoInfo> {
+
+  const responseHeaders = new Headers();
+
+  const randomName = Math.random().toString(36).substring(2, 15);
+
+  responseHeaders.set(
+    "Content-Disposition",
+    `attachment; filename="${randomName}.mp4"`,
+  );
+
+  responseHeaders.set('Content-Type', 'audio/mp4')
+
+  responseHeaders.set(
+  "User-Agent",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+);
+
+  responseHeaders.set("Accept-Language", "en-US,en;q=0.9");
+  responseHeaders.set("Referer", "https://www.youtube.com/");
+  responseHeaders.set("sec-ch-ua", '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"');
+  responseHeaders.set("sec-ch-ua-mobile", "?0");
+  responseHeaders.set("sec-ch-ua-platform", '"Windows"');
+
   return withRetry(
     async () => {
       const urlWithParam = `${videoURL}&nocache=${generateRandomParam()}`;
       
       return await ytdl.getBasicInfo(urlWithParam, {
         requestOptions: {
-          headers: {
-            "Cache-Control": "no-cache, no-store",
-            "Pragma": "no-cache",
-            "Expires": "0",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-          }
+          headers: responseHeaders
         }
       });
     },
