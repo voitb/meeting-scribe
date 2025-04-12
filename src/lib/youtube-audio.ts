@@ -114,7 +114,38 @@ export async function downloadYouTubeAudio(videoURL: string, tempBasePath: strin
   }
 }
 
-export async function transcribeAudio(audioFilePath: string, language: string = "auto"): Promise<unknown> {
+export interface GroqTranscriptionWord {
+  word: string;
+  start: number;
+  end: number;
+}
+
+export interface GroqTranscriptionSegment {
+  id: number;
+  seek: number;
+  start: number;
+  end: number;
+  text: string;
+  tokens: number[];
+  temperature: number;
+  avg_logprob: number;
+  compression_ratio: number;
+  no_speech_prob: number;
+}
+
+export interface GroqTranscriptionResponse {
+  task: string;
+  language: string;
+  duration: number;
+  text: string;
+  words: GroqTranscriptionWord[];
+  segments: GroqTranscriptionSegment[];
+  x_groq?: {
+    id: string;
+  };
+}
+
+export async function transcribeAudio(audioFilePath: string, language: string = "auto"): Promise<GroqTranscriptionResponse> {
   const groq = new Groq();
   
   const transcriptionOptions = {
@@ -126,7 +157,7 @@ export async function transcribeAudio(audioFilePath: string, language: string = 
     language: language !== "auto" ? language : undefined,
   };
   
-  return await groq.audio.transcriptions.create(transcriptionOptions);
+  return await groq.audio.transcriptions.create(transcriptionOptions) as GroqTranscriptionResponse;
 }
 
 export async function fetchAudioFromYouTube(videoURL: string, language: string = "auto"): Promise<{
@@ -151,9 +182,18 @@ export async function fetchAudioFromYouTube(videoURL: string, language: string =
     tempFilePath = validateAudioFile(tempFilePath);
     
     console.log("Starting audio transcription...");
-    const transcription = await transcribeAudio(tempFilePath, language);
+    const transcriptionResult = await transcribeAudio(tempFilePath, language);
     console.log("Transcription completed successfully!");
     
+    const transcription = { ...transcriptionResult };
+    if (transcription.segments && Array.isArray(transcription.segments)) {
+      transcription.segments = transcription.segments.map(segment => ({
+        ...segment,
+        start: Math.floor(segment.start),
+        end: Math.floor(segment.end)
+      }));
+    }
+
     cleanupTempFiles([tempFilePath]);
     
     return { 

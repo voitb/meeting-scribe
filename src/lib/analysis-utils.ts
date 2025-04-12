@@ -215,7 +215,7 @@ export async function analyzeTranscription(
   const prompt = `
 You are an expert in analyzing lectures and podcasts, creating high-quality educational materials.
 
-IMPORTANT – TIME FORMAT (hh:mm:ss):
+IMPORTANT - TIME FORMAT (hh:mm:ss):
 1. In the transcription, time is given in seconds.
 2. In your final answer, all "startTime" and "endTime" values MUST be in the "hh:mm:ss" format (hours:minutes:seconds).
 3. Convert the original seconds from the transcription exactly into hh:mm:ss (no rounding, no shortening).
@@ -286,7 +286,7 @@ Remember:
 - When creating the chapters, pay special attention to the minimum duration of 2-3 minutes.
 - For instance, if a segment shows start: 125 → "00:02:05" and end: 368 → "00:06:08", preserve those exact values, unchanged.
 - Values in the "startTime" and "endTime" keys must be in the "hh:mm:ss" format (hours, minutes, seconds) and SHOULD BE BASED ON VALID SEGMENT TIMES. BE SURE THE VALUES ARE NOT ROUNDED OR SHORTENED OR EVEN MISSED OR SKIPPED OR BAD OR INCORRECT. IF IT's SECONDS THEN IT'S SECONDS. IF IT's MINUTES THEN IT's MINUTES. IF IT's HOURS THEN IT's HOURS. 
-- BE SURE THAT EVERYTHING HAS CORRECT ASCII, NO OTHER THAN ENGLISH LANGUAGE, NO OTHER NOT ENGLISH LANGUAGE. NOT ANY INVALID CHARACTERS THAT WOULD BREAK THE JSON FORMAT.
+- BE SURE THAT EVERYTHING HAS CORRECT ASCII, DON'T USE NOT HANDLED CHARACTERS, ONLY GLOSSORY IN ENGLISH, NO OTHER THAN ENGLISH LANGUAGE, NO OTHER NOT ENGLISH LANGUAGE. NOT ANY INVALID CHARACTERS THAT WOULD BREAK THE JSON FORMAT.
 Here is the transcription of the recording (segments in seconds):
 ${JSON.stringify(transcription.segments, null, 2)}
 
