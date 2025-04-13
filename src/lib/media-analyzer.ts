@@ -1,6 +1,7 @@
-import { Transcription, VideoAnalysisResult, analyzeTranscription } from "./analysis-utils";
 import { fetchAudioFromYouTube } from "./youtube-audio";
 import { withRetry } from "./file-utils";
+import { Transcription, VideoAnalysisResult } from "@/types/analysis.types";
+import { analyzeTranscription } from "./services/analysis-service";
 
 export type MediaAnalysisInput = {
   sourceUrl: string;

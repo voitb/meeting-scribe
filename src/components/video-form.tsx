@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Youtube } from "lucide-react";
-import { extractVideoId } from "@/lib/utils";
+import { Loader2, Music } from "lucide-react";
 // import {
 //   Select,
 //   SelectContent,
@@ -19,8 +18,8 @@ import { extractVideoId } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AnimatedFormWrapper } from "./animated-form-wrapper";
 
-export default function VideoForm() {
-  const [url, setUrl] = useState("");
+export default function AudioForm() {
+  const [audioFile, setAudioFile] = useState<File | null>(null);
   const [
     language,
     // , setLanguage
@@ -32,13 +31,8 @@ export default function VideoForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!url) {
-      setError("Please enter a YouTube URL");
-      return;
-    }
-
-    if (!url.includes("youtube.com/") && !url.includes("youtu.be/")) {
-      setError("Please enter a valid YouTube URL");
+    if (!audioFile) {
+      setError("Please select an audio file");
       return;
     }
 
@@ -46,17 +40,61 @@ export default function VideoForm() {
     setIsLoading(true);
 
     try {
-      const videoId = await extractVideoId(url);
-      if (!videoId) {
-        throw new Error("Invalid YouTube URL");
+      const formData = new FormData();
+      formData.append("audioFile", audioFile);
+      formData.append("language", language);
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error processing audio");
       }
 
-      router.push(`/result/${videoId}?lang=${language}`);
+      const transcriptionData = await response.json();
+      const audioId = transcriptionData.audioId || Date.now().toString();
+
+      router.push(`/result/${audioId}`);
     } catch (err) {
-      setError("Failed to process video. Please try again.");
+      setError("Failed to process the audio file. Please try again.");
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const validAudioTypes = [
+        "audio/mpeg",
+        "audio/wav",
+        "audio/mp3",
+        "audio/ogg",
+        "audio/x-m4a",
+        "audio/webm",
+      ];
+
+      if (!validAudioTypes.includes(file.type)) {
+        setError(
+          "Invalid file format. Supported formats: MP3, WAV, OGG, M4A, WEBM"
+        );
+        setAudioFile(null);
+        return;
+      }
+
+      // Limit file size to 10MB
+      if (file.size > 10 * 1024 * 1024) {
+        setError("File is too large. Maximum size is 10MB");
+        setAudioFile(null);
+        return;
+      }
+
+      setAudioFile(file);
+      setError("");
     }
   };
 
@@ -72,13 +110,13 @@ export default function VideoForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <motion.label
-                  htmlFor="youtube-url"
+                  htmlFor="audio-file"
                   className="block text-base font-medium text-foreground"
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                  Enter YouTube Video URL
+                  Select an audio file to analyze
                 </motion.label>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <motion.div
@@ -88,47 +126,16 @@ export default function VideoForm() {
                     transition={{ delay: 0.4, duration: 0.5 }}
                   >
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <Youtube className="h-5 w-5 text-muted-foreground" />
+                      <Music className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <Input
-                      id="youtube-url"
-                      type="text"
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
+                      id="audio-file"
+                      type="file"
+                      accept="audio/*"
+                      onChange={handleFileChange}
                       className="pl-10"
                       disabled={isLoading}
                     />
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.5 }}
-                  >
-                    {/* <Select
-                      value={language}
-                      onValueChange={setLanguage}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="polish">Polish (Polski)</SelectItem>
-                        <SelectItem value="english">English</SelectItem>
-                        <SelectItem value="german">German (Deutsch)</SelectItem>
-                        <SelectItem value="french">
-                          French (Français)
-                        </SelectItem>
-                        <SelectItem value="spanish">
-                          Spanish (Español)
-                        </SelectItem>
-                        <SelectItem value="italian">
-                          Italian (Italiano)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select> */}
                   </motion.div>
 
                   <motion.div
@@ -169,7 +176,14 @@ export default function VideoForm() {
                 transition={{ delay: 0.7, duration: 0.5 }}
               >
                 <p>
-                  Processing usually takes 1-3 minutes depending on video length
+                  Processing typically takes 1-3 minutes depending on the
+                  recording length
+                </p>
+                <p className="mt-2 text-xs flex items-center">
+                  <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full mr-2">
+                    Note
+                  </span>
+                  Max file size is 25 MB access
                 </p>
               </motion.div>
             </form>

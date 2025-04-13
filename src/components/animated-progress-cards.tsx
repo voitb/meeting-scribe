@@ -41,28 +41,28 @@ export function AnimatedProgressCards({
     {
       icon: <Headphones className="h-10 w-10 " />,
       emoji: "🎵",
-      title: "Downloading Audio",
-      description: "Extracting audio from the YouTube video for analysis.",
+      title: "Downloading audio",
+      description: "Extracting audio from YouTube video for analysis.",
     },
     {
       icon: <FileText className="h-10 w-10 " />,
       emoji: "📝",
-      title: "Creating Transcription",
-      description: "Converting speech to text with advanced AI technology.",
+      title: "Creating transcription",
+      description: "Converting speech to text using advanced AI technology.",
     },
     {
       icon: <Brain className="h-10 w-10 " />,
       emoji: "🧠",
-      title: "Analyzing Content",
+      title: "Analyzing content",
       description:
-        "Identifying key concepts, summarizing content, and generating educational materials.",
+        "Identifying key concepts, summarizing content and generating educational materials.",
     },
     {
       icon: <CheckCircle className="h-10 w-10 " />,
       emoji: "✨",
-      title: "Finalizing Results",
+      title: "Finalizing results",
       description:
-        "Organizing all materials into a comprehensive learning package.",
+        "Organizing all materials into a comprehensive educational package.",
     },
   ];
 

@@ -13,7 +13,9 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as videos from "../videos.js";
+import type * as audio from "../audio.js";
+import type * as debug from "../debug.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -24,7 +26,9 @@ import type * as videos from "../videos.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  videos: typeof videos;
+  audio: typeof audio;
+  debug: typeof debug;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

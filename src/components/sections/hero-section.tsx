@@ -1,62 +1,48 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
-import { useState, useEffect } from "react";
-
 export function HeroSection() {
-  const [mounted, setMounted] = useState(false);
-
-  // Prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
-    <motion.div
-      className="text-center mb-16"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
+    <div className="text-center py-12">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-foreground mb-3">
+        <span className="text-primary">Meeting</span>Scribe
+      </h1>
+      <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+        Transform audio recordings into high-quality meeting notes with AI
+      </p>
+      <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <CheckCircledIcon className="h-5 w-5 text-primary" />
+          <span>Audio transcription</span>
+        </div>
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <CheckCircledIcon className="h-5 w-5 text-primary" />
+          <span>Intelligent summaries</span>
+        </div>
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <CheckCircledIcon className="h-5 w-5 text-primary" />
+          <span>Structured notes</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+// Icon component
+function CheckCircledIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
     >
-      <motion.div
-        className="inline-flex items-center justify-center p-2 bg-accent/50 rounded-full mb-4"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-      >
-        <span className="text-sm font-medium text-foreground">
-          AI-Powered Learning
-        </span>
-      </motion.div>
-      <motion.h1
-        className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.4 }}
-      >
-        YouTube Learning Assistant
-      </motion.h1>
-      <motion.p
-        className="text-xl text-muted-foreground max-w-2xl mx-auto"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.5 }}
-      >
-        Transform YouTube videos into comprehensive educational materials with
-        the power of AI
-      </motion.p>
-      <motion.div
-        className="inline-flex items-center justify-center mt-4 p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg text-yellow-800 dark:text-yellow-200"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.6 }}
-      >
-        <AlertCircle className="h-4 w-4 mr-2" />
-        <span className="text-sm">Maximum video length: 5 minutes</span>
-      </motion.div>
-    </motion.div>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
   );
 }

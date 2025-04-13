@@ -4,14 +4,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
-import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "YouTube Learning Assistant",
+  title: "MeetingScribe | AI Meeting Transcription & Notes",
   description:
-    "Transform YouTube videos into valuable educational materials with AI",
+    "Transform audio recordings into high-quality meeting notes with AI transcription and analysis",
 };
 
 export default function RootLayout({
@@ -22,12 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ConvexClientProvider>
+        <AuthProvider>
           <ThemeProvider defaultTheme="dark">
             <Toaster richColors position="top-center" />
             {children}
           </ThemeProvider>
-        </ConvexClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Headphones, FileText, Brain, CheckCircle } from "lucide-react";
+import { FileText, Brain, CheckCircle, FileAudio } from "lucide-react";
 
 interface ProgressCardsProps {
   currentStep: number;
@@ -29,35 +29,35 @@ export function ProgressCards({ currentStep }: ProgressCardsProps) {
   // Step information
   const steps = [
     {
-      icon: <Headphones className="h-10 w-10 " />,
-      emoji: "🎵",
-      title: "Analyzing YouTube",
-      description: "Extracting audio from the video for analysis.",
+      icon: <FileAudio className="h-10 w-10 " />,
+      emoji: "🎙️",
+      title: "Processing audio",
+      description: "Preparing the meeting recording for analysis.",
       joke: {
-        emoji: "🙄",
-        title: "YouTube is being stubborn...",
+        emoji: "⏳",
+        title: "This may take a moment...",
         description:
-          "It seems YouTube is playing hard to get. We're still trying to extract the audio.",
+          "The audio file is being processed. Thank you for your patience.",
       },
     },
     {
       icon: <FileText className="h-10 w-10 " />,
       emoji: "📝",
-      title: "Creating analysis",
-      description: "Converting speech to text with advanced AI technology.",
+      title: "Creating transcription",
+      description:
+        "Converting speech to text using advanced artificial intelligence.",
     },
     {
       icon: <Brain className="h-10 w-10 " />,
       emoji: "🧠",
-      title: "Analyzing Content",
-      description:
-        "Identifying key concepts and generating educational materials.",
+      title: "Analyzing meeting",
+      description: "Identifying key points and insights from the meeting.",
     },
     {
       icon: <CheckCircle className="h-10 w-10 text-green-500" />,
       emoji: "✨",
-      title: "Analysis Complete!",
-      description: "All materials have been successfully generated.",
+      title: "Analysis complete!",
+      description: "The meeting summary has been successfully generated.",
     },
   ];
 
@@ -65,7 +65,7 @@ export function ProgressCards({ currentStep }: ProgressCardsProps) {
   const displayInfo =
     showJoke && currentStepInfo.joke ? currentStepInfo.joke : currentStepInfo;
 
-  // Animacje dla zawartości karty
+  // Card content animations
   const contentAnimation = {
     hidden: { opacity: 0 },
     visible: {

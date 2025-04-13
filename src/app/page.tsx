@@ -1,21 +1,18 @@
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import VideoForm from "@/components/video-form";
+import AudioForm from "@/components/video-form";
 import { HeroSection } from "@/components/sections/hero-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { FeaturesSection } from "@/components/sections/features-section";
-import { RecentVideosSection } from "@/components/sections/recent-videos-section";
+import { RecentAudioSection } from "@/components/sections/recent-audio-section";
+import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header with theme toggle */}
-        <header className="flex justify-end mb-8">
-          <ThemeToggle />
-        </header>
+      <Navbar />
 
+      <div className="container mx-auto px-4 pt-6 pb-8">
         <div className="max-w-4xl mx-auto">
           <HeroSection />
 
@@ -27,7 +24,7 @@ export default function Home() {
               </div>
             }
           >
-            <VideoForm />
+            <AudioForm />
           </Suspense>
 
           <div className="mt-24 space-y-16">
@@ -39,7 +36,7 @@ export default function Home() {
                 </div>
               }
             >
-              <RecentVideosSection />
+              <RecentAudioSection />
             </Suspense>
             <FeaturesSection />
           </div>

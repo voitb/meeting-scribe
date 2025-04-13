@@ -1,0 +1,1433 @@
+{
+  "task": "transcribe",
+  "language": "English",
+  "duration": 180.8459165,
+  "text": " Or My dirty mouth will drown you out And I won't let you turn me down I won't lie up I speak my mind And scream until my lungs are dry I won't bite my tongue Or stay in my cage If opening my mind makes me insane What's sunny? He's drowning me I'm not a slave to who you serve I need to breathe And I need to bleed No more living with this curse What's sunny? What's sunny? What sunny I alien I out of place I wouldn have it any other way I won't fall in, I've had enough When it comes to truth I'm upper blood I won't bite my tongue But stay in my cage If screaming to be hurt makes me insane What's drowning? He's drowning me I'm not a slave to who you serve I need to breathe And I need to bleed No more living with this curse One city One city One city One city these things are wise",
+  "words": [
+    {
+      "word": "Or",
+      "start": 0,
+      "end": 15.16
+    },
+    {
+      "word": "My",
+      "start": 30.02,
+      "end": 31
+    },
+    {
+      "word": "dirty",
+      "start": 31,
+      "end": 31.78
+    },
+    {
+      "word": "mouth",
+      "start": 31.78,
+      "end": 32.84
+    },
+    {
+      "word": "will",
+      "start": 32.84,
+      "end": 33.54
+    },
+    {
+      "word": "drown",
+      "start": 33.54,
+      "end": 34.04
+    },
+    {
+      "word": "you",
+      "start": 34.04,
+      "end": 34.48
+    },
+    {
+      "word": "out",
+      "start": 34.48,
+      "end": 35.44
+    },
+    {
+      "word": "And",
+      "start": 35.44,
+      "end": 37.4
+    },
+    {
+      "word": "I",
+      "start": 37.4,
+      "end": 37.6
+    },
+    {
+      "word": "won't",
+      "start": 37.6,
+      "end": 37.86
+    },
+    {
+      "word": "let",
+      "start": 37.86,
+      "end": 38.14
+    },
+    {
+      "word": "you",
+      "start": 38.14,
+      "end": 38.44
+    },
+    {
+      "word": "turn",
+      "start": 38.44,
+      "end": 38.78
+    },
+    {
+      "word": "me",
+      "start": 38.78,
+      "end": 39.04
+    },
+    {
+      "word": "down",
+      "start": 39.04,
+      "end": 39.7
+    },
+    {
+      "word": "I",
+      "start": 39.7,
+      "end": 41
+    },
+    {
+      "word": "won't",
+      "start": 41,
+      "end": 41.54
+    },
+    {
+      "word": "lie",
+      "start": 41.54,
+      "end": 41.9
+    },
+    {
+      "word": "up",
+      "start": 41.9,
+      "end": 42.78
+    },
+    {
+      "word": "I",
+      "start": 42.78,
+      "end": 43.5
+    },
+    {
+      "word": "speak",
+      "start": 43.5,
+      "end": 43.86
+    },
+    {
+      "word": "my",
+      "start": 43.86,
+      "end": 44.46
+    },
+    {
+      "word": "mind",
+      "start": 44.46,
+      "end": 45.54
+    },
+    {
+      "word": "And",
+      "start": 45.54,
+      "end": 47.34
+    },
+    {
+      "word": "scream",
+      "start": 47.34,
+      "end": 47.66
+    },
+    {
+      "word": "until",
+      "start": 47.66,
+      "end": 48.06
+    },
+    {
+      "word": "my",
+      "start": 48.06,
+      "end": 48.4
+    },
+    {
+      "word": "lungs",
+      "start": 48.4,
+      "end": 48.8
+    },
+    {
+      "word": "are",
+      "start": 48.8,
+      "end": 49.02
+    },
+    {
+      "word": "dry",
+      "start": 49.02,
+      "end": 49.36
+    },
+    {
+      "word": "I",
+      "start": 49.36,
+      "end": 51.36
+    },
+    {
+      "word": "won't",
+      "start": 51.36,
+      "end": 51.74
+    },
+    {
+      "word": "bite",
+      "start": 51.74,
+      "end": 52.02
+    },
+    {
+      "word": "my",
+      "start": 52.02,
+      "end": 52.36
+    },
+    {
+      "word": "tongue",
+      "start": 52.36,
+      "end": 52.96
+    },
+    {
+      "word": "Or",
+      "start": 52.96,
+      "end": 53.52
+    },
+    {
+      "word": "stay",
+      "start": 53.52,
+      "end": 53.88
+    },
+    {
+      "word": "in",
+      "start": 53.88,
+      "end": 54.24
+    },
+    {
+      "word": "my",
+      "start": 54.24,
+      "end": 54.54
+    },
+    {
+      "word": "cage",
+      "start": 54.54,
+      "end": 55.36
+    },
+    {
+      "word": "If",
+      "start": 55.36,
+      "end": 56.14
+    },
+    {
+      "word": "opening",
+      "start": 56.14,
+      "end": 56.82
+    },
+    {
+      "word": "my",
+      "start": 56.82,
+      "end": 57.32
+    },
+    {
+      "word": "mind",
+      "start": 57.32,
+      "end": 57.76
+    },
+    {
+      "word": "makes",
+      "start": 57.76,
+      "end": 58.36
+    },
+    {
+      "word": "me",
+      "start": 58.36,
+      "end": 58.92
+    },
+    {
+      "word": "What's",
+      "start": 60.48,
+      "end": 61.24
+    },
+    {
+      "word": "sunny?",
+      "start": 61.24,
+      "end": 62.22
+    },
+    {
+      "word": "He's",
+      "start": 63.3,
+      "end": 63.64
+    },
+    {
+      "word": "drowning",
+      "start": 63.64,
+      "end": 64.12
+    },
+    {
+      "word": "me",
+      "start": 64.12,
+      "end": 64.8
+    },
+    {
+      "word": "I'm",
+      "start": 64.88,
+      "end": 66.08
+    },
+    {
+      "word": "not",
+      "start": 66.08,
+      "end": 66.56
+    },
+    {
+      "word": "a",
+      "start": 66.56,
+      "end": 67.02
+    },
+    {
+      "word": "slave",
+      "start": 67.02,
+      "end": 67.78
+    },
+    {
+      "word": "to",
+      "start": 67.78,
+      "end": 68.26
+    },
+    {
+      "word": "who",
+      "start": 68.26,
+      "end": 68.7
+    },
+    {
+      "word": "you",
+      "start": 68.7,
+      "end": 69.32
+    },
+    {
+      "word": "serve",
+      "start": 69.32,
+      "end": 69.96
+    },
+    {
+      "word": "I",
+      "start": 70.06,
+      "end": 71.08
+    },
+    {
+      "word": "need",
+      "start": 71.08,
+      "end": 71.42
+    },
+    {
+      "word": "to",
+      "start": 71.42,
+      "end": 71.72
+    },
+    {
+      "word": "breathe",
+      "start": 71.72,
+      "end": 72.2
+    },
+    {
+      "word": "And",
+      "start": 72.54,
+      "end": 73.38
+    },
+    {
+      "word": "I",
+      "start": 73.38,
+      "end": 73.56
+    },
+    {
+      "word": "need",
+      "start": 73.56,
+      "end": 73.9
+    },
+    {
+      "word": "to",
+      "start": 73.9,
+      "end": 74.2
+    },
+    {
+      "word": "bleed",
+      "start": 74.2,
+      "end": 74.6
+    },
+    {
+      "word": "No",
+      "start": 74.98,
+      "end": 75.96
+    },
+    {
+      "word": "more",
+      "start": 75.96,
+      "end": 76.52
+    },
+    {
+      "word": "living",
+      "start": 76.52,
+      "end": 77.2
+    },
+    {
+      "word": "with",
+      "start": 77.2,
+      "end": 77.72
+    },
+    {
+      "word": "this",
+      "start": 77.72,
+      "end": 78.22
+    },
+    {
+      "word": "curse",
+      "start": 78.22,
+      "end": 78.78
+    },
+    {
+      "word": "What's",
+      "start": 78.32,
+      "end": 79.72
+    },
+    {
+      "word": "sunny?",
+      "start": 79.72,
+      "end": 80.12
+    },
+    {
+      "word": "What's",
+      "start": 83.86,
+      "end": 84.62
+    },
+    {
+      "word": "sunny?",
+      "start": 84.62,
+      "end": 85.1
+    },
+    {
+      "word": "What's",
+      "start": 84.7,
+      "end": 84.72
+    },
+    {
+      "word": "sunny?",
+      "start": 84.72,
+      "end": 85.96
+    },
+    {
+      "word": "I'm",
+      "start": 86.62,
+      "end": 91.12
+    },
+    {
+      "word": "alien,",
+      "start": 91.12,
+      "end": 93.4
+    },
+    {
+      "word": "I'm",
+      "start": 93.4,
+      "end": 93.66
+    },
+    {
+      "word": "out",
+      "start": 93.63591,
+      "end": 94.015915
+    },
+    {
+      "word": "of",
+      "start": 94.015915,
+      "end": 94.375916
+    },
+    {
+      "word": "place",
+      "start": 94.375916,
+      "end": 95.235916
+    },
+    {
+      "word": "I",
+      "start": 95.235916,
+      "end": 96.67591
+    },
+    {
+      "word": "wouldn't",
+      "start": 96.67591,
+      "end": 97.13591
+    },
+    {
+      "word": "have",
+      "start": 97.13591,
+      "end": 97.61591
+    },
+    {
+      "word": "it",
+      "start": 97.61591,
+      "end": 97.79591
+    },
+    {
+      "word": "any",
+      "start": 97.79591,
+      "end": 98.39591
+    },
+    {
+      "word": "other",
+      "start": 98.39591,
+      "end": 98.85591
+    },
+    {
+      "word": "way",
+      "start": 98.85591,
+      "end": 99.515915
+    },
+    {
+      "word": "I",
+      "start": 100.77591,
+      "end": 100.975914
+    },
+    {
+      "word": "won't",
+      "start": 100.975914,
+      "end": 101.61591
+    },
+    {
+      "word": "fall",
+      "start": 101.61591,
+      "end": 102.13591
+    },
+    {
+      "word": "in,",
+      "start": 102.13591,
+      "end": 103.31591
+    },
+    {
+      "word": "I've",
+      "start": 103.31591,
+      "end": 103.655914
+    },
+    {
+      "word": "had",
+      "start": 103.655914,
+      "end": 104.015915
+    },
+    {
+      "word": "enough",
+      "start": 104.015915,
+      "end": 104.91591
+    },
+    {
+      "word": "When",
+      "start": 104.91591,
+      "end": 107.055916
+    },
+    {
+      "word": "it",
+      "start": 107.055916,
+      "end": 107.17591
+    },
+    {
+      "word": "comes",
+      "start": 107.17591,
+      "end": 107.49591
+    },
+    {
+      "word": "to",
+      "start": 107.49591,
+      "end": 107.77591
+    },
+    {
+      "word": "truth",
+      "start": 107.77591,
+      "end": 108.13591
+    },
+    {
+      "word": "I'm",
+      "start": 108.13591,
+      "end": 108.57591
+    },
+    {
+      "word": "upper",
+      "start": 108.57591,
+      "end": 108.91591
+    },
+    {
+      "word": "blood",
+      "start": 108.91591,
+      "end": 109.375916
+    },
+    {
+      "word": "I",
+      "start": 109.655914,
+      "end": 111.31591
+    },
+    {
+      "word": "won't",
+      "start": 111.31591,
+      "end": 111.735916
+    },
+    {
+      "word": "bite",
+      "start": 111.735916,
+      "end": 111.99591
+    },
+    {
+      "word": "my",
+      "start": 111.99591,
+      "end": 112.31591
+    },
+    {
+      "word": "tongue",
+      "start": 112.31591,
+      "end": 112.975914
+    },
+    {
+      "word": "But",
+      "start": 113.09592,
+      "end": 113.53591
+    },
+    {
+      "word": "stay",
+      "start": 113.53591,
+      "end": 113.91591
+    },
+    {
+      "word": "in",
+      "start": 113.91591,
+      "end": 114.21591
+    },
+    {
+      "word": "my",
+      "start": 114.21591,
+      "end": 114.53591
+    },
+    {
+      "word": "cage",
+      "start": 114.53591,
+      "end": 115.43591
+    },
+    {
+      "word": "If",
+      "start": 115.79591,
+      "end": 116.03591
+    },
+    {
+      "word": "screaming",
+      "start": 116.03591,
+      "end": 116.53591
+    },
+    {
+      "word": "to",
+      "start": 116.53591,
+      "end": 117.03591
+    },
+    {
+      "word": "be",
+      "start": 117.03591,
+      "end": 117.375916
+    },
+    {
+      "word": "hurt",
+      "start": 117.375916,
+      "end": 117.77591
+    },
+    {
+      "word": "makes",
+      "start": 117.77591,
+      "end": 118.335915
+    },
+    {
+      "word": "me",
+      "start": 118.335915,
+      "end": 118.975914
+    },
+    {
+      "word": "insane",
+      "start": 118.975914,
+      "end": 119.69591
+    },
+    {
+      "word": "What's",
+      "start": 120.49591,
+      "end": 121.19591
+    },
+    {
+      "word": "drowning?",
+      "start": 121.19591,
+      "end": 121.61591
+    },
+    {
+      "word": "He's",
+      "start": 123.25591,
+      "end": 123.63591
+    },
+    {
+      "word": "drowning",
+      "start": 123.63591,
+      "end": 124.13591
+    },
+    {
+      "word": "me",
+      "start": 124.13591,
+      "end": 124.69591
+    },
+    {
+      "word": "I'm",
+      "start": 124.875916,
+      "end": 126.11591
+    },
+    {
+      "word": "not",
+      "start": 126.11591,
+      "end": 126.515915
+    },
+    {
+      "word": "a",
+      "start": 126.515915,
+      "end": 127.25591
+    },
+    {
+      "word": "slave",
+      "start": 127.25591,
+      "end": 127.75591
+    },
+    {
+      "word": "to",
+      "start": 127.75591,
+      "end": 128.29591
+    },
+    {
+      "word": "who",
+      "start": 128.29591,
+      "end": 128.6959
+    },
+    {
+      "word": "you",
+      "start": 128.6959,
+      "end": 129.31592
+    },
+    {
+      "word": "serve",
+      "start": 129.31592,
+      "end": 129.77591
+    },
+    {
+      "word": "I",
+      "start": 129.8959,
+      "end": 131.05591
+    },
+    {
+      "word": "need",
+      "start": 131.05591,
+      "end": 131.3959
+    },
+    {
+      "word": "to",
+      "start": 131.3959,
+      "end": 131.6959
+    },
+    {
+      "word": "breathe",
+      "start": 131.6959,
+      "end": 132.17592
+    },
+    {
+      "word": "And",
+      "start": 132.55591,
+      "end": 133.37592
+    },
+    {
+      "word": "I",
+      "start": 133.37592,
+      "end": 133.55591
+    },
+    {
+      "word": "need",
+      "start": 133.55591,
+      "end": 133.87592
+    },
+    {
+      "word": "to",
+      "start": 133.87592,
+      "end": 134.1959
+    },
+    {
+      "word": "bleed",
+      "start": 134.1959,
+      "end": 134.55591
+    },
+    {
+      "word": "No",
+      "start": 135.45592,
+      "end": 135.95592
+    },
+    {
+      "word": "more",
+      "start": 135.95592,
+      "end": 136.47592
+    },
+    {
+      "word": "living",
+      "start": 136.47592,
+      "end": 137.17592
+    },
+    {
+      "word": "with",
+      "start": 137.17592,
+      "end": 137.6959
+    },
+    {
+      "word": "this",
+      "start": 137.6959,
+      "end": 138.21591
+    },
+    {
+      "word": "curse",
+      "start": 138.21591,
+      "end": 138.77591
+    },
+    {
+      "word": "One",
+      "start": 138.81592,
+      "end": 139.35591
+    },
+    {
+      "word": "city",
+      "start": 139.35591,
+      "end": 140.05591
+    },
+    {
+      "word": "One",
+      "start": 143.81592,
+      "end": 144.31592
+    },
+    {
+      "word": "city",
+      "start": 144.31592,
+      "end": 145.1159
+    },
+    {
+      "word": "One",
+      "start": 148.31592,
+      "end": 149.31592
+    },
+    {
+      "word": "city",
+      "start": 149.31592,
+      "end": 150.07591
+    },
+    {
+      "word": "One",
+      "start": 153.8359,
+      "end": 154.29591
+    },
+    {
+      "word": "city",
+      "start": 154.29591,
+      "end": 155.09592
+    },
+    {
+      "word": "these",
+      "start": 168.81592,
+      "end": 180.77591
+    },
+    {
+      "word": "things",
+      "start": 180.77591,
+      "end": 180.79591
+    },
+    {
+      "word": "are",
+      "start": 180.79591,
+      "end": 180.81592
+    },
+    {
+      "word": "wise",
+      "start": 180.81592,
+      "end": 180.8359
+    }
+  ],
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0,
+      "end": 21,
+      "text": " Or",
+      "tokens": [
+        50365,
+        1610,
+        51456
+      ],
+      "temperature": 1,
+      "avg_logprob": -4.483902,
+      "compression_ratio": 0.2,
+      "no_speech_prob": 5.2183743e-12
+    },
+    {
+      "id": 1,
+      "seek": 3000,
+      "start": 30,
+      "end": 60,
+      "text": " My dirty mouth will drown you out And I won't let you turn me down I won't lie up I speak my mind And scream until my lungs are dry I won't bite my tongue Or stay in my cage If opening my mind makes me insane",
+      "tokens": [
+        50365,
+        1222,
+        9360,
+        4525,
+        486,
+        20337,
+        291,
+        484,
+        400,
+        286,
+        1582,
+        380,
+        718,
+        291,
+        1261,
+        385,
+        760,
+        286,
+        1582,
+        380,
+        4544,
+        493,
+        286,
+        1710,
+        452,
+        1575,
+        400,
+        7291,
+        1826,
+        452,
+        19467,
+        366,
+        4016,
+        286,
+        1582,
+        380,
+        7988,
+        452,
+        10601,
+        1610,
+        1754,
+        294,
+        452,
+        17302,
+        759,
+        5193,
+        452,
+        1575,
+        1669,
+        385,
+        10838
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.1310887,
+      "compression_ratio": 1.4857143,
+      "no_speech_prob": 1.5752738e-11
+    },
+    {
+      "id": 2,
+      "seek": 6000,
+      "start": 60,
+      "end": 61,
+      "text": " What's sunny?",
+      "tokens": [
+        50365,
+        708,
+        311,
+        20412,
+        30,
+        50452
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 3,
+      "seek": 6000,
+      "start": 62,
+      "end": 64,
+      "text": " He's drowning me",
+      "tokens": [
+        50502,
+        634,
+        311,
+        37198,
+        385,
+        50612
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 4,
+      "seek": 6000,
+      "start": 64,
+      "end": 70,
+      "text": " I'm not a slave to who you serve",
+      "tokens": [
+        50612,
+        286,
+        478,
+        406,
+        257,
+        14777,
+        281,
+        567,
+        291,
+        4596,
+        50885
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 5,
+      "seek": 6000,
+      "start": 70,
+      "end": 72,
+      "text": " I need to breathe",
+      "tokens": [
+        50885,
+        286,
+        643,
+        281,
+        10192,
+        50994
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 6,
+      "seek": 6000,
+      "start": 72,
+      "end": 74,
+      "text": " And I need to bleed",
+      "tokens": [
+        50994,
+        400,
+        286,
+        643,
+        281,
+        28385,
+        51113
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 7,
+      "seek": 6000,
+      "start": 74,
+      "end": 78,
+      "text": " No more living with this curse",
+      "tokens": [
+        51113,
+        883,
+        544,
+        2647,
+        365,
+        341,
+        17139,
+        51306
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 8,
+      "seek": 6000,
+      "start": 78,
+      "end": 80,
+      "text": " What's sunny?",
+      "tokens": [
+        51306,
+        708,
+        311,
+        20412,
+        30,
+        51373
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 9,
+      "seek": 6000,
+      "start": 83,
+      "end": 85,
+      "text": " What's sunny?",
+      "tokens": [
+        51533,
+        708,
+        311,
+        20412,
+        30,
+        51625
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.5634495,
+      "compression_ratio": 1.539823,
+      "no_speech_prob": 1.1704359e-11
+    },
+    {
+      "id": 10,
+      "seek": 85,
+      "start": 85,
+      "end": 99,
+      "text": " What sunny I alien I out of place I wouldn have it any other way",
+      "tokens": [
+        51625,
+        708,
+        311,
+        20412,
+        30,
+        51660,
+        50365,
+        286,
+        478,
+        12319,
+        11,
+        286,
+        478,
+        484,
+        295,
+        1081,
+        286,
+        2759,
+        380,
+        362,
+        309,
+        604,
+        661,
+        636,
+        51092
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.32842278,
+      "compression_ratio": 1.2336448,
+      "no_speech_prob": 9.060146e-12
+    },
+    {
+      "id": 11,
+      "seek": 85,
+      "start": 99,
+      "end": 109,
+      "text": " I won't fall in, I've had enough When it comes to truth I'm upper blood",
+      "tokens": [
+        51092,
+        286,
+        1582,
+        380,
+        2100,
+        294,
+        11,
+        286,
+        600,
+        632,
+        1547,
+        1133,
+        309,
+        1487,
+        281,
+        3494,
+        286,
+        478,
+        6597,
+        3390,
+        51576
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.32842278,
+      "compression_ratio": 1.2336448,
+      "no_speech_prob": 9.060146e-12
+    },
+    {
+      "id": 12,
+      "seek": 2507,
+      "start": 109,
+      "end": 113,
+      "text": " I won't bite my tongue",
+      "tokens": [
+        50365,
+        286,
+        1582,
+        380,
+        7988,
+        452,
+        10601,
+        50537
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 13,
+      "seek": 2507,
+      "start": 113,
+      "end": 115,
+      "text": " But stay in my cage",
+      "tokens": [
+        50537,
+        583,
+        1754,
+        294,
+        452,
+        17302,
+        50655
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 14,
+      "seek": 2507,
+      "start": 115,
+      "end": 119,
+      "text": " If screaming to be hurt makes me insane",
+      "tokens": [
+        50655,
+        759,
+        12636,
+        281,
+        312,
+        4607,
+        1669,
+        385,
+        10838,
+        50877
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 15,
+      "seek": 2507,
+      "start": 119,
+      "end": 121,
+      "text": " What's drowning?",
+      "tokens": [
+        50877,
+        708,
+        311,
+        37198,
+        30,
+        50967
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 16,
+      "seek": 2507,
+      "start": 123,
+      "end": 124,
+      "text": " He's drowning me",
+      "tokens": [
+        51034,
+        634,
+        311,
+        37198,
+        385,
+        51129
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 17,
+      "seek": 2507,
+      "start": 124,
+      "end": 130,
+      "text": " I'm not a slave to who you serve",
+      "tokens": [
+        51129,
+        286,
+        478,
+        406,
+        257,
+        14777,
+        281,
+        567,
+        291,
+        4596,
+        51401
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 18,
+      "seek": 2507,
+      "start": 130,
+      "end": 132,
+      "text": " I need to breathe",
+      "tokens": [
+        51401,
+        286,
+        643,
+        281,
+        10192,
+        51512
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 19,
+      "seek": 2507,
+      "start": 132,
+      "end": 135,
+      "text": " And I need to bleed",
+      "tokens": [
+        51512,
+        400,
+        286,
+        643,
+        281,
+        28385,
+        51634
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 20,
+      "seek": 2507,
+      "start": 135,
+      "end": 138,
+      "text": " No more living with this curse",
+      "tokens": [
+        51634,
+        883,
+        544,
+        2647,
+        365,
+        341,
+        17139,
+        51823
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.29362684,
+      "compression_ratio": 1.4630872,
+      "no_speech_prob": 1.6832952e-11
+    },
+    {
+      "id": 21,
+      "seek": 5423,
+      "start": 138,
+      "end": 140,
+      "text": " One city",
+      "tokens": [
+        50365,
+        1485,
+        2307,
+        50465
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.72451645,
+      "compression_ratio": 1.75,
+      "no_speech_prob": 8.1375575e-12
+    },
+    {
+      "id": 22,
+      "seek": 5423,
+      "start": 143,
+      "end": 145,
+      "text": " One city",
+      "tokens": [
+        50615,
+        1485,
+        2307,
+        50715
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.72451645,
+      "compression_ratio": 1.75,
+      "no_speech_prob": 8.1375575e-12
+    },
+    {
+      "id": 23,
+      "seek": 5423,
+      "start": 148,
+      "end": 150,
+      "text": " One city",
+      "tokens": [
+        50865,
+        1485,
+        2307,
+        50965
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.72451645,
+      "compression_ratio": 1.75,
+      "no_speech_prob": 8.1375575e-12
+    },
+    {
+      "id": 24,
+      "seek": 5423,
+      "start": 153,
+      "end": 155,
+      "text": " One city",
+      "tokens": [
+        51115,
+        1485,
+        2307,
+        51215
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.72451645,
+      "compression_ratio": 1.75,
+      "no_speech_prob": 8.1375575e-12
+    },
+    {
+      "id": 25,
+      "seek": 8423,
+      "start": 168,
+      "end": 180,
+      "text": " these things are wise",
+      "tokens": [
+        50365,
+        613,
+        721,
+        366,
+        10829,
+        50963
+      ],
+      "temperature": 1,
+      "avg_logprob": -3.7291956,
+      "compression_ratio": 0.7241379,
+      "no_speech_prob": 4.468004e-12
+    }
+  ],
+  "x_groq": {
+    "id": "req_01jrr0ktqyfp48mpq5mgbn3x8n"
+  }
+}

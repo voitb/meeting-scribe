@@ -1,337 +1,251 @@
-import { groq } from '@ai-sdk/groq';
-import { generateText } from 'ai'; 
+import type { Transcription, VideoAnalysisResult, ParsedAIResponse,} from '@/types/analysis.types'
 
-export type VideoAnalysisResult = {
-  title: string;
-  summary: string;
-  keyPoints: string[];
-  videoChapters: VideoChapter[];
-  presentationQuality: {
-    overallClarity: string;
-    difficultSegments: {
-      startTime: string;
-      endTime: string;
-      issue: string;
-      improvement: string;
-    }[];
-    improvementSuggestions: string[];
-  };
-  glossary: Record<string, string>;
-}
+// --- Funkcje do czyszczenia i parsowania odpowiedzi AI ---
 
-export type VideoChapter = {
-  startTime: string;
-  endTime: string;
-  title: string;
-  description: string;
-}
-
-interface ParsedAIResponse {
-  summary: string;
-  keyPoints: string[];
-  discussionQuestions: string[];
-  videoChapters?: VideoChapter[];
-  videoPoints?: VideoChapter[];
-  glossary?: Record<string, string>;
-  presentationQuality?: {
-    overallClarity: string;
-    difficultSegments: {
-      startTime: string;
-      endTime: string;
-      issue: string;
-      improvement: string;
-    }[];
-    improvementSuggestions: string[];
-  };
-  [key: string]: unknown;
-}
-
-export interface Transcription {
-  task: string;
-  language: string;
-  duration: number;
-  text: string;
-  words: Word[];
-  segments: Segment[];
-  x_groq: {
-      id: string;
-  };
-}
-
-interface Word {
-  word: string;
-  start: number;
-  end: number;
-}
-
-interface Segment {
-  id: number;
-  seek: number;
-  start: number;
-  end: number;
-  text: string;
-  tokens: number[];
-  temperature: number;
-  avg_logprob: number;
-  compression_ratio: number;
-  no_speech_prob: number;
-}
-
-export async function cleanAndParseAIResponse(responseText: string): Promise<ParsedAIResponse> {
+/**
+ * Czyści odpowiedź tekstową z AI, próbując wyizolować i sparsować blok JSON.
+ */
+export async function cleanAndParseAIResponse(responseText: string): Promise<ParsedAIResponse | null> {
+  console.log("Attempting to clean and parse AI response...");
   let cleanedResponse = responseText;
-  
-  const extractJsonBlock = (text: string): string => { 
+
+  const extractJsonBlock = (text: string): string => {
     const startIndex = text.indexOf('{');
     const endIndex = text.lastIndexOf('}');
-    
     if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
       return text.substring(startIndex, endIndex + 1);
     }
-    return text;
-  };
-  
-  if (cleanedResponse.includes("```")) {
+    // Fallback: try to find JSON within markdown
     const codeBlockRegex = /```(?:json)?([\s\S]*?)```/;
-    const match = cleanedResponse.match(codeBlockRegex);
-    
+    const match = text.match(codeBlockRegex);
     if (match && match[1]) {
-      cleanedResponse = match[1].trim();
-      console.log("Extracted code block content");
-      cleanedResponse = extractJsonBlock(cleanedResponse);
-    } else {
-      cleanedResponse = cleanedResponse.replace(/```(?:json)?/g, "").replace(/```/g, "").trim();
-      console.log("Removed markdown code block tags");
-      cleanedResponse = extractJsonBlock(cleanedResponse);
+        const innerJsonMatch = match[1].match(/\{[\s\S]*\}/);
+        if (innerJsonMatch) return innerJsonMatch[0];
     }
-  } else {
-    cleanedResponse = extractJsonBlock(cleanedResponse);
-  }
-  
+    return text; // Return original if no clear JSON block found
+  };
+
+  cleanedResponse = extractJsonBlock(cleanedResponse);
+
+  // Remove control characters and normalize newlines
   cleanedResponse = cleanedResponse
     .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, "")
     .replace(/\r\n|\n|\r/g, " ")
-    .replace(/\\(?!["\\/bfnrt])/g, "\\\\")
-    .replace(/([^\\])\\([^"\\/bfnrtu])/g, "$1\\\\$2")
-    .replace(/([^\\])\\'/g, "$1\\\\'");
-  
+    .replace(/\\(?!["\\/bfnrt])/g, "\\\\") // Fix potentially problematic backslashes
+    .replace(/([^\\])\\([^"\\/bfnrtu])/g, "$1\\\\$2") // Fix escaped quotes incorrectly formatted
+    .replace(/([^\\])\\'/g, "$1\\\\'"); // Fix escaped single quotes
+
   try {
-    console.log("Attempting to parse cleaned response as JSON");
+    console.log("Attempting to parse cleaned response as JSON.");
     return JSON.parse(cleanedResponse) as ParsedAIResponse;
   } catch (error) {
-    console.error("Error parsing JSON after cleaning:", error);
-    
+    console.warn("Initial JSON parsing failed:", error);
+    console.log("Attempting to fix JSON structure...");
     const fixedResponse = attemptToFixJsonStructure(cleanedResponse);
-    if (fixedResponse !== cleanedResponse) {
-      try {
-        console.log("Attempting to parse fixed JSON structure");
-        return JSON.parse(fixedResponse) as ParsedAIResponse;
-      } catch (fixError) {
-        console.error("Failed to parse fixed JSON:", fixError);
+    try {
+      console.log("Attempting to parse fixed JSON structure.");
+      return JSON.parse(fixedResponse) as ParsedAIResponse;
+    } catch (fixError) {
+      console.error("Failed to parse even the fixed JSON:", fixError);
+      console.error("Problematic JSON string:", cleanedResponse); // Log the problematic string
+      // Attempt to extract summary if possible as a last resort
+      if(!cleanedResponse.includes('{') || !cleanedResponse.includes('}')) {
+          console.log("Response lacks JSON structure. Returning text as summary.");
+          return { summary: cleanedResponse.substring(0, 2000), keyPoints: [], actionItems: [], decisionsMade: [], videoChapters: [] };
       }
-    }
-    
-    if (!cleanedResponse.includes('{') || !cleanedResponse.includes('}')) {
-      console.log("Response doesn't contain JSON structure, attempting to create a simple response");
-      const simpleResponse: ParsedAIResponse = {
-        summary: cleanedResponse,
-        keyPoints: [],
-        discussionQuestions: [],
-        videoChapters: []
-      };
-      return simpleResponse;
-    }
-    
-    console.log("Attempting to extract JSON structure using regex");
-    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      console.log("Found potential JSON structure");
-      try {
-        const extractedJson = jsonMatch[0]
-          .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, "")
-          .replace(/\r\n|\n|\r/g, " ")
-          .replace(/\\(?!["\\/bfnrt])/g, "\\\\")
-          .replace(/([^\\])\\([^"\\/bfnrtu])/g, "$1\\\\$2")
-          .replace(/([^\\])\\'/g, "$1\\\\'");
-        
-        return JSON.parse(extractedJson) as ParsedAIResponse;
-      } catch (error) {
-        console.error("Failed to parse extracted JSON structure:", error);
-        
-        console.log("Falling back to default response structure");
-        const fallbackResponse: ParsedAIResponse = {
-          summary: cleanedResponse.substring(0, 2000),
-          keyPoints: [],
-          discussionQuestions: [],
-          videoChapters: []
-        };
-        return fallbackResponse;
-      }
-    } else {
-      console.error("No JSON format found in response:", cleanedResponse);
-      
-      console.log("Creating fallback response with the text as summary");
-      return {
-        summary: cleanedResponse.substring(0, 2000),
-        keyPoints: [],
-        discussionQuestions: [],
-        videoChapters: []
-      };
+      return null; // Indicate failure to parse
     }
   }
 }
 
+/**
+ * Próbuje naprawić typowe błędy w stringu JSON.
+ */
 function attemptToFixJsonStructure(jsonString: string): string {
-  let result = jsonString;
-  
-  result = result.replace(/,\s*,/g, ',');
-  
+  let result = jsonString.trim();
+
+  // Remove trailing commas before closing braces/brackets
   result = result.replace(/,\s*}/g, '}');
   result = result.replace(/,\s*]/g, ']');
-  
-  result = result.replace(/([^\\])"([^"]*?)([^\\])"/g, '$1"$2$3\\"');
-  
+
+  // Add missing closing braces/brackets (basic attempt)
   const openBraces = (result.match(/\{/g) || []).length;
   const closeBraces = (result.match(/\}/g) || []).length;
   if (openBraces > closeBraces) {
     result += '}'.repeat(openBraces - closeBraces);
   }
-  
+
   const openBrackets = (result.match(/\[/g) || []).length;
   const closeBrackets = (result.match(/\]/g) || []).length;
   if (openBrackets > closeBrackets) {
     result += ']'.repeat(openBrackets - closeBrackets);
   }
-  
+
+  // Note: More complex fixes like handling unquoted keys or incorrect string escapes
+  // are harder to generalize and might corrupt valid data. This focuses on common structural issues.
+
   return result;
 }
 
-export async function analyzeTranscription(
-  title: string, 
-  transcription: Transcription, 
-  outputLanguage: string = "english"
-): Promise<VideoAnalysisResult> {
-  console.log("Starting text analysis with Groq model");
 
-  const prompt = `
-You are an expert in analyzing lectures and podcasts, creating high-quality educational materials.
+// --- Funkcje do dzielenia transkrypcji i łączenia wyników ---
 
-IMPORTANT - TIME FORMAT (hh:mm:ss):
-1. In the transcription, time is given in seconds.
-2. In your final answer, all "startTime" and "endTime" values MUST be in the "hh:mm:ss" format (hours:minutes:seconds).
-3. Convert the original seconds from the transcription exactly into hh:mm:ss (no rounding, no shortening).
-
-Your task:
-
-1. **Provide a detailed summary** of the recording (between 30 and 50 sentences).
-2. **List 5-7 key points** or concepts discussed in the material.
-3. **Divide the recording into 5-10 chapters** ("videoChapters") covering the entire content from "00:00:00" to the last second of the recording:
-   - Each chapter MUST last at least 2-3 minutes (preferably 5-15 minutes).
-   - Chapters should represent major, coherent topics (avoid very short sections).
-   - Calculate the "startTime" and "endTime" of the chapters from the segment "start" and "end" times (in seconds) provided in the transcription — then convert them to hh:mm:ss.
-   - Make sure the chapters together cover the entire time range (from "00:00:00" to the maximum end time), with no gaps.
-
-4. **Assess the presentation quality**:
-   - Provide an overall assessment of clarity (overallClarity).
-   - Identify up to 5 challenging segments (provide their time ranges in hh:mm:ss), describe the issue (issue), and propose an improvement (improvement).
-   - Add general suggestions (improvementSuggestions) for enhancing the presentation.
-
-5. **Create a glossary (glossary)**:
-   - List ONLY the terms that are actually defined or explained in the recording.
-   - For each term, provide a short explanation/definition and the approximate time (hh:mm:ss) where the explanation appears.
-
-**NOTE**: In your response, **only** return a properly formatted JSON object, with no additional markings. The structure must look exactly like this (use your own content within the keys):
-
-{
-  "summary": "Place your detailed summary here...",
-  "keyPoints": [
-    "Key point 1",
-    "Key point 2",
-    ...
-  ],
-  "videoChapters": [
-    {
-      "startTime": "00:00:00",
-      "endTime": "00:10:00",
-      "title": "Chapter title",
-      "description": "Short description"
-    },
-    ...
-  ],
-  "presentationQuality": {
-    "overallClarity": "Overall assessment of clarity and effectiveness",
-    "difficultSegments": [
-      {
-        "startTime": "00:00:00",
-        "endTime": "00:03:00",
-        "issue": "Issue description",
-        "improvement": "Suggested improvement"
-      },
-      ...
-    ],
-    "improvementSuggestions": [
-      "Suggestion 1",
-      "Suggestion 2",
-      ...
-    ]
-  },
-  "glossary": {
-    "Term 1": "Definition + approximate time (hh:mm:ss)",
-    "Term 2": "Definition + approximate time (hh:mm:ss)"
+/**
+ * Dzieli długą transkrypcję na mniejsze części, uwzględniając limit segmentów i długość tekstu.
+ */
+export function splitTranscriptionIntoChunks(transcription: Transcription, maxSegmentsPerChunk: number = 50, maxTextLengthPerChunk: number = 15000): Transcription[] {
+  if (!transcription.segments || transcription.segments.length === 0) {
+    console.log("No segments found in transcription.");
+    return [transcription]; // Return as is if no segments
   }
+
+  const totalSegments = transcription.segments.length;
+  const totalTextLength = transcription.text?.length || 0;
+
+  console.log(`Transcription details: ${totalSegments} segments, ${totalTextLength} characters.`);
+
+  // Check if chunking is needed based on segment count or text length
+  if (totalSegments <= maxSegmentsPerChunk && totalTextLength <= maxTextLengthPerChunk) {
+    console.log("Transcription size within limits. No chunking required.");
+    return [transcription];
+  }
+
+  console.log(`Chunking needed. Max segments/chunk: ${maxSegmentsPerChunk}, Max text length/chunk: ${maxTextLengthPerChunk}`);
+
+  const chunks: Transcription[] = [];
+  let currentSegmentIndex = 0;
+
+  while (currentSegmentIndex < totalSegments) {
+    let chunkEndIndex = Math.min(currentSegmentIndex + maxSegmentsPerChunk, totalSegments);
+    let currentChunkTextLength = 0;
+    let segmentCountInChunk = 0;
+
+    // Determine chunk end based on segment count and text length
+    for (let i = currentSegmentIndex; i < chunkEndIndex; i++) {
+      const segmentTextLength = transcription.segments[i].text?.length || 0;
+      if (currentChunkTextLength + segmentTextLength > maxTextLengthPerChunk && segmentCountInChunk > 5) { // Ensure chunk isn't too small
+          chunkEndIndex = i; // End before this segment
+          console.log(`Chunk limit reached by text length at index ${i}.`);
+          break;
+      }
+      currentChunkTextLength += segmentTextLength;
+      segmentCountInChunk++;
+    }
+
+     // Ensure we don't create an empty chunk if the loop breaks early
+     if (chunkEndIndex <= currentSegmentIndex) {
+        chunkEndIndex = currentSegmentIndex + 1; // Take at least one segment
+        console.warn("Forcing chunk end index to avoid empty chunk.");
+     }
+
+
+    const segmentsChunk = transcription.segments.slice(currentSegmentIndex, chunkEndIndex);
+
+    if (segmentsChunk.length === 0) {
+        console.error("Attempted to create an empty chunk. Breaking loop.");
+        break; // Avoid infinite loop if something went wrong
+    }
+
+
+    const chunkStartTime = segmentsChunk[0].start;
+    const chunkEndTime = segmentsChunk[segmentsChunk.length - 1].end;
+
+    const chunkText = segmentsChunk.map(segment => segment.text).join(' ');
+    const chunkWords = transcription.words?.filter(word => word.start >= chunkStartTime && word.end <= chunkEndTime) || [];
+
+    const chunkTranscription: Transcription = {
+      ...transcription, // Copy metadata
+      segments: segmentsChunk,
+      text: chunkText,
+      words: chunkWords,
+      // Adjust duration if needed, though less critical for chunks
+      duration: chunkEndTime - chunkStartTime,
+    };
+
+    chunks.push(chunkTranscription);
+    console.log(`Created chunk ${chunks.length}: Segments ${currentSegmentIndex + 1}-${chunkEndIndex} (${segmentsChunk.length} segments, ${chunkText.length} chars)`);
+
+    currentSegmentIndex = chunkEndIndex; // Move to the next segment
+  }
+
+  console.log(`Successfully split into ${chunks.length} chunks.`);
+  return chunks;
 }
 
-Remember:
-- No other tags, text, or comments - just JSON.
-- Every "startTime" and "endTime" must correspond exactly to the original segment's seconds, converted to hh:mm:ss.
-- When creating the chapters, pay special attention to the minimum duration of 2-3 minutes.
-- For instance, if a segment shows start: 125 → "00:02:05" and end: 368 → "00:06:08", preserve those exact values, unchanged.
-- Values in the "startTime" and "endTime" keys must be in the "hh:mm:ss" format (hours, minutes, seconds) and SHOULD BE BASED ON VALID SEGMENT TIMES. BE SURE THE VALUES ARE NOT ROUNDED OR SHORTENED OR EVEN MISSED OR SKIPPED OR BAD OR INCORRECT. IF IT's SECONDS THEN IT'S SECONDS. IF IT's MINUTES THEN IT's MINUTES. IF IT's HOURS THEN IT's HOURS. 
-- BE SURE THAT EVERYTHING HAS CORRECT ASCII, DON'T USE NOT HANDLED CHARACTERS, ONLY GLOSSORY IN ENGLISH, NO OTHER THAN ENGLISH LANGUAGE, NO OTHER NOT ENGLISH LANGUAGE. NOT ANY INVALID CHARACTERS THAT WOULD BREAK THE JSON FORMAT.
-Here is the transcription of the recording (segments in seconds):
-${JSON.stringify(transcription.segments, null, 2)}
-
-Be sure to fill in all the required elements (summary, key points, chapters, quality assessment, glossary) and answer in ${outputLanguage}.
-`;
-  
-  try {
-    const { text: analysisResponse } = await generateText({
-      model: groq('llama-3.3-70b-specdec'),
-      prompt: prompt,
-      temperature: 0.4,
-    });
-    
-    console.log("Received response from model, processing...");
-    const parsedResponse = await cleanAndParseAIResponse(analysisResponse);
-    if(!parsedResponse) {
-      throw new Error("Invalid response from model");
-    }
-    
+/**
+ * Łączy wyniki analizy z wielu części transkrypcji w jeden spójny wynik.
+ */
+export function mergeAnalysisResults(results: VideoAnalysisResult[], originalTitle: string): VideoAnalysisResult {
+  if (!results || results.length === 0) {
+    console.error("Cannot merge empty results array.");
+    // Return a default empty structure or throw an error
     return {
-      title,
-      summary: parsedResponse.summary || "",
-      keyPoints: parsedResponse.keyPoints || [],
-      videoChapters: parsedResponse.videoChapters || [],
-      presentationQuality: parsedResponse.presentationQuality || {
-        overallClarity: "",
-        difficultSegments: [],
-        improvementSuggestions: []
-      },
-      glossary: parsedResponse.glossary || {}
-    };
-  } catch (error) {
-    console.error("Error during text analysis:", error);
-    
-    return {
-      title,
-      summary: `An error occurred during transcription analysis: ${error instanceof Error ? error.message : String(error)}`,
-      keyPoints: [],
-      videoChapters: [],
-      presentationQuality: {
-        overallClarity: "",
-        difficultSegments: [],
-        improvementSuggestions: []
-      },
-      glossary: {}
+        title: originalTitle,
+        summary: "Error: No analysis results to merge.",
+        keyPoints: [],
+        actionItems: [],
+        decisionsMade: [],
+        videoChapters: [],
+        presentationQuality: { overallClarity: "N/A", difficultSegments: [], improvementSuggestions: [] },
+        glossary: {}
     };
   }
-} 
+
+  if (results.length === 1) {
+    console.log("Only one result, no merging needed.");
+    return results[0];
+  }
+
+  console.log(`Merging ${results.length} analysis results...`);
+
+  const merged: VideoAnalysisResult = {
+    title: originalTitle,
+    summary: results.map(r => r.summary).filter(Boolean).join("\n\n---\n\n"), // Combine summaries, separated
+    keyPoints: Array.from(new Set(results.flatMap(r => r.keyPoints || []))), // Unique key topics
+    actionItems: results.flatMap(r => r.actionItems || []), // Combine all action items
+    decisionsMade: Array.from(new Set(results.flatMap(r => r.decisionsMade || []))), // Unique decisions
+    videoChapters: results
+        .flatMap(r => r.videoChapters || [])
+        .sort((a, b) => timeToSeconds(a.startTime) - timeToSeconds(b.startTime)), // Combine and sort chapters
+    presentationQuality: {
+        overallClarity: results.map(r => r.presentationQuality?.overallClarity).filter(Boolean).join("\n"), // Combine clarity assessments
+        difficultSegments: results.flatMap(r => r.presentationQuality?.difficultSegments || []), // Combine difficult segments
+        improvementSuggestions: Array.from(new Set(results.flatMap(r => r.presentationQuality?.improvementSuggestions || []))) // Unique suggestions
+    },
+    glossary: results.reduce((acc, curr) => ({ ...acc, ...(curr.glossary || {}) }), {}) // Merge glossaries, later entries overwrite earlier ones for the same term
+  };
+
+  console.log("Merging completed.");
+  return merged;
+}
+
+/** Helper function to convert hh:mm:ss or mm:ss to seconds for sorting */
+function timeToSeconds(timeStr: string): number {
+    if (!timeStr || typeof timeStr !== 'string') return 0;
+    const parts = timeStr.split(':').map(Number);
+    let seconds = 0;
+    if (parts.length === 3) { // hh:mm:ss
+        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) { // mm:ss
+        seconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 1) { // ss
+        seconds = parts[0];
+    }
+    return isNaN(seconds) ? 0 : seconds;
+}
+
+/** Helper function to convert seconds to "hh:mm:ss" format */
+export function formatTime(totalSeconds: number): string {
+  if (isNaN(totalSeconds) || totalSeconds < 0) {
+    return "00:00:00";
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+
+  return `${hh}:${mm}:${ss}`;
+}

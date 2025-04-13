@@ -1,11 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeTranscription } from "@/lib/analysis-utils";
-import { MediaAnalysisResult } from "@/lib/media-analyzer";
+import { initializeProgress } from "@/lib/progress-store";
+import { currentUser } from "@clerk/nextjs/server";
+import { VideoAnalysisResult } from "@/types/analysis.types";
+import { analyzeTranscription } from "@/lib/services/analysis-service";
+
+// Extend VideoAnalysisResult type with fields needed for database storage
+interface EnhancedAnalysisResult extends VideoAnalysisResult {
+  userId?: string;
+  analysisDate: string;
+  sourceUrl?: string;
+  originalFileName?: string;
+}
 
 export async function POST(req: NextRequest) {
   try {
     console.log("Starting POST request processing in /api/summarize");
-    const { videoDetails: {title}, transcription, outputLanguage = "polish" } = await req.json();
+    const data = await req.json();
+    
+    // Handle both videoDetails and audioDetails
+    const title = data.videoDetails?.title || data.audioDetails?.title || "Untitled Recording";
+    const { transcription, outputLanguage = "english" } = data;
+    
+    // Get or generate audioId
+    const audioId = data.audioId || data.videoDetails?.id || data.audioDetails?.id;
+    
+    // Preserve original filename if available
+    const originalFileName = data.audioDetails?.originalFileName || data.videoDetails?.originalFileName;
+    if (originalFileName) {
+      console.log(`Original filename preserved: ${originalFileName}`);
+    }
+    
+    // Get userId from Clerk
+    const user = await currentUser();
+    const userId = user?.id;
+    console.log(`User ID from Clerk: ${userId || 'not logged in'}`);
+    
+    if (!audioId) {
+      console.error("Missing audio identifier for progress tracking");
+    }
      
     if (!transcription.text) {
       throw new Error("No transcription text to analyze");
@@ -13,15 +45,27 @@ export async function POST(req: NextRequest) {
     
     console.log("Starting transcription analysis...");
     
+    // Initialize analysis progress if we have audioId
+    if (audioId) {
+      console.log(`Initializing progress tracking for audioId: ${audioId}`);
+      initializeProgress(audioId);
+    }
+    
+    // Pass audioId to analysis function for progress tracking
     const analysisResult = await analyzeTranscription(
       title,
       transcription,
-      outputLanguage
+      outputLanguage,
+      audioId
     );
 
-    const result: Partial<MediaAnalysisResult> = {
+    // Add userId and analysis date to result
+    const result: EnhancedAnalysisResult = {
       ...analysisResult,
       analysisDate: new Date().toISOString(),
+      userId,
+      sourceUrl: audioId,
+      originalFileName: originalFileName || title
     };
     
     console.log("Final result prepared, returning response");

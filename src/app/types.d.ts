@@ -1,16 +1,16 @@
-// Deklaracja dla pdfkit
+// Declaration for pdfkit
 declare module 'pdfkit' {
   interface PDFDocumentOptions {
     margin?: number;
-    size?: string;
+    size?: string; 
     font?: string | null;
-    [key: string]: unknown; // Dla innych opcji, których nie wymieniamy
+    [key: string]: unknown; // For other options we don't list
   }
 
   interface TextOptions {
     align?: 'left' | 'center' | 'right' | 'justify';
     underline?: boolean;
-    [key: string]: unknown; // Dla innych opcji
+    [key: string]: unknown; // For other options
   }
 
   export default class PDFDocument {
@@ -21,4 +21,4 @@ declare module 'pdfkit' {
     on(event: string, callback: (chunk: Uint8Array) => void): void;
     end(): void;
   }
-} 
+}
