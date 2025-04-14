@@ -7,9 +7,7 @@ export function PageHeader() {
     <div className="page-header py-4 md:py-6">
       <div className="flex flex-col items-start gap-4 md:flex-row">
         <div className="flex-1 space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Your Meeting Notes
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Your Notes</h1>
           <p className="text-lg text-muted-foreground">
             Manage and revisit your transcribed recordings.
           </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckSquare } from "lucide-react";
-import type { AnalysisResult } from "@/components/results-content";
+import type { AnalysisResult } from "@/types/analysis";
 
 type ActionItem = NonNullable<AnalysisResult["actionItems"]>[number];
 

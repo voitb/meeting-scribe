@@ -31,9 +31,6 @@ interface AnalysisFilterPanelProps {
   };
 }
 
-/**
- * Panel filtrowania dla historii analiz
- */
 export function AnalysisFilterPanel({
   filters,
   setters,

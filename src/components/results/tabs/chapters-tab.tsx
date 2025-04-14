@@ -5,13 +5,9 @@ import type { VideoChapter } from "@/components/video-chapters";
 
 interface ChaptersTabProps {
   chapters: VideoChapter[];
-  onChapterClick: (seconds: number) => void;
 }
 
-/**
- * Chapters tab component
- */
-export function ChaptersTab({ chapters, onChapterClick }: ChaptersTabProps) {
+export function ChaptersTab({ chapters }: ChaptersTabProps) {
   if (!chapters || chapters.length === 0) {
     return (
       <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm sm:text-base">
@@ -20,5 +16,5 @@ export function ChaptersTab({ chapters, onChapterClick }: ChaptersTabProps) {
     );
   }
 
-  return <VideoChapters chapters={chapters} onChapterClick={onChapterClick} />;
+  return <VideoChapters chapters={chapters} />;
 }

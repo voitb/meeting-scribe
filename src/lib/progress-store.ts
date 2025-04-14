@@ -1,18 +1,6 @@
-// Data structure for analysis progress
-export interface AnalysisProgress {
-  audioId: string;
-  status: 'pending' | 'processing' | 'completed' | 'error';
-  currentStep: number; // 0: transcription, 1: analysis, 2: results generation, 3: completed
-  totalChunks: number;
-  currentChunk: number;
-  chunkProgress: number; // 0-100
-  message: string;
-  error?: string;
-  updatedAt: Date;
-}
+import { AnalysisProgress } from "@/types/progress";
 
 // Simple in-memory progress store
-// In a production app this should be stored in a database or Redis
 const progressStore = new Map<string, AnalysisProgress>();
 
 // Initialize progress for new audio
@@ -65,7 +53,7 @@ export function updateChunkProgress(
   
   return updateProgress(audioId, {
     status: 'processing',
-    currentStep: 1, // Analysis step
+    currentStep: 1,
     totalChunks,
     currentChunk,
     chunkProgress,
@@ -82,7 +70,7 @@ export function getProgress(audioId: string): AnalysisProgress | null {
 export function markAsCompleted(audioId: string, message: string = 'Analysis completed successfully'): AnalysisProgress {
   return updateProgress(audioId, {
     status: 'completed',
-    currentStep: 3, // Final step
+    currentStep: 3,
     chunkProgress: 100,
     message
   });
@@ -97,7 +85,7 @@ export function markAsError(audioId: string, error: string): AnalysisProgress {
   });
 }
 
-// Cleanup inactive progress entries (optional)
+// Cleanup inactive progress entries
 export function cleanupOldProgress(maxAgeMinutes: number = 60): void {
   const now = new Date();
   

@@ -2,11 +2,11 @@
 
 import { useParams } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ResultsContent from "@/components/results-content";
+import AnalysisContent from "@/components/analysis/content";
 import { Navbar } from "@/components/navbar";
-import { useAudioAnalysis } from "@/hooks/use-audio-analysis";
+import { useAudioAnalysis } from "@/hooks/analysis/use-audio-analysis";
 import { LoadingState } from "@/components/ui/loading-state";
-import { AudioHeader } from "@/components/audio/audio-header";
+import { AudioHeader } from "@/components/audio-header";
 import { BackButton } from "@/components/ui/back-button";
 
 export function ResultsContainer() {
@@ -26,7 +26,7 @@ export function ResultsContainer() {
         <div className="container mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-8">
           <BackButton />
           <AudioHeader title={title} />
-          <ResultsContent audioId={audioId} />
+          <AnalysisContent audioId={audioId} />
         </div>
       </main>
     </ScrollArea>

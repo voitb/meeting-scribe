@@ -15,9 +15,9 @@ import {
   Clock,
   Layers,
 } from "lucide-react";
-import { TabWithTooltip } from "./tab-with-tooltip";
-import { checkOverflow, scrollElement } from "../utils/scroll-handler";
-import type { AnalysisResult } from "@/components/results-content";
+import { TabWithTooltip } from "@/components/ui/tab-with-tooltip";
+import { checkOverflow, scrollElement } from "../../../utils/scroll-handler";
+import type { AnalysisResult } from "@/types/analysis";
 
 interface TabListProps {
   result: AnalysisResult;

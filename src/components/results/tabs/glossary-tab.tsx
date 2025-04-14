@@ -6,9 +6,6 @@ interface GlossaryTabProps {
   glossary: Record<string, string>;
 }
 
-/**
- * Glossary tab component
- */
 export function GlossaryTab({ glossary }: GlossaryTabProps) {
   if (!glossary || Object.keys(glossary).length === 0) return null;
 

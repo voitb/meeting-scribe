@@ -55,7 +55,7 @@ export function SortControls({
           </div>
           <Button
             variant="outline"
-            className="h-10 w-10"
+            className="h-9 w-9"
             onClick={onToggleSortDirection}
             title={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
           >

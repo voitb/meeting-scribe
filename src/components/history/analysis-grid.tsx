@@ -1,10 +1,9 @@
-"use client";
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { AnalysisCard } from "./analysis-card";
+import { AnimatedGrid } from "./animated-grid";
 
 export interface Analysis {
   _id: string;
@@ -71,7 +70,7 @@ export function AnalysisGrid({
   }
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <AnimatedGrid>
       {results.analyses.map((analysis) => (
         <AnalysisCard
           key={analysis._id}
@@ -84,6 +83,6 @@ export function AnalysisGrid({
           hasAudio={!!analysis.audioSize}
         />
       ))}
-    </div>
+    </AnimatedGrid>
   );
 }

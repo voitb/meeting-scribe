@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import AudioForm from "@/components/video-form";
 import { HeroSection } from "@/components/sections/hero-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { FeaturesSection } from "@/components/sections/features-section";
-import { RecentAudioSection } from "@/components/audio/history/recent-audio-section";
 import { Navbar } from "@/components/navbar";
 import { AuthWrapper } from "@/components/auth/auth-wrapper";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import MediaForm from "@/components/media-form/media-form";
+import { RecentAudioSection } from "@/components/sections/recent-audio-section";
 
 export default function Home() {
   return (
@@ -30,7 +30,7 @@ export default function Home() {
               }
             >
               <AuthWrapper>
-                <AudioForm />
+                <MediaForm />
               </AuthWrapper>
             </Suspense>
 

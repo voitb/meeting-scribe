@@ -20,8 +20,7 @@ export function FeaturesSection() {
     {
       icon: <BookOpen className="h-6 w-6 text-foreground" />,
       title: "Smart Summaries",
-      description:
-        "Generate concise, accurate summaries of even the longest videos",
+      description: "Generate concise summaries of your meetings",
     },
     {
       icon: (
@@ -47,7 +46,7 @@ export function FeaturesSection() {
       icon: <Clock className="h-6 w-6 text-foreground" />,
       title: "Time Chapters",
       description:
-        "Divide videos into logical sections with timestamps for easy navigation",
+        "Divide into logical sections with timestamps for easy navigation",
     },
     {
       icon: <MessageSquare className="h-6 w-6 text-foreground" />,
@@ -59,7 +58,7 @@ export function FeaturesSection() {
       icon: <BookOpen className="h-6 w-6 text-foreground" />,
       title: "Glossary",
       description:
-        "Automatically extract key terms and definitions directly from the video content",
+        "Automatically extract key terms and definitions directly from the content",
     },
     {
       icon: <Download className="h-6 w-6 text-foreground" />,

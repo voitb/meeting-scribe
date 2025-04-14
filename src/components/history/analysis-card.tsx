@@ -32,9 +32,9 @@ export function AnalysisCard({
   return (
     <Card
       key={id}
-      className="overflow-hidden flex flex-col hover:shadow-md transition-all border-muted/70 hover:border-primary/30"
+      className="overflow-hidden flex flex-col h-full hover:shadow-md transition-all border-muted/70 hover:border-primary/30"
     >
-      <CardContent className="p-6 flex-1">
+      <CardContent className="p-6 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2 mb-3">
           <h3 className="font-medium text-lg line-clamp-2">{title}</h3>
           {hasAudio && (
@@ -44,11 +44,11 @@ export function AnalysisCard({
           )}
         </div>
 
-        <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
+        <p className="text-muted-foreground text-sm line-clamp-3 mb-4 flex-1">
           {summary.substring(0, 150)}...
         </p>
 
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-auto">
           {keyPoints.slice(0, 2).map((point, idx) => (
             <div
               key={idx}

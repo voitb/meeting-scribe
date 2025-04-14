@@ -2,6 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import {
+  AnimatedFilePreview,
+  AnimatedButton,
+} from "./animated-form-components";
 
 interface FilePreviewProps {
   file: File;
@@ -14,28 +18,32 @@ interface FilePreviewProps {
  */
 export function FilePreview({ file, isVideo, isLoading }: FilePreviewProps) {
   return (
-    <div className="flex items-center justify-between bg-muted/10 p-3 rounded-lg">
-      <div>
-        <p className="font-medium">{file.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {isVideo ? "Video" : "Audio"} •{" "}
-          {(file.size / (1024 * 1024)).toFixed(2)} MB
-        </p>
+    <AnimatedFilePreview>
+      <div className="flex items-center justify-between bg-muted/10 p-3 rounded-lg">
+        <div>
+          <p className="font-medium">{file.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {isVideo ? "Video" : "Audio"} •{" "}
+            {(file.size / (1024 * 1024)).toFixed(2)} MB
+          </p>
+        </div>
+        <AnimatedButton>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-orange-500 hover:bg-orange-600 text-white dark:bg-orange-600 dark:hover:bg-orange-700"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing
+              </>
+            ) : (
+              "Analyze"
+            )}
+          </Button>
+        </AnimatedButton>
       </div>
-      <Button
-        type="submit"
-        disabled={isLoading}
-        className="bg-orange-500 hover:bg-orange-600 text-white dark:bg-orange-600 dark:hover:bg-orange-700"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing
-          </>
-        ) : (
-          "Analyze"
-        )}
-      </Button>
-    </div>
+    </AnimatedFilePreview>
   );
 }

@@ -8,72 +8,87 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock } from "lucide-react";
 import { useConvexAuth } from "convex/react";
 import { LoginButton } from "../auth/login-button";
+import {
+  AnimatedSectionHeading,
+  AnimatedCard,
+  AnimatedButtonContainer,
+  AnimatedFadeInContainer,
+} from "./animated-section-components";
+import { AnimatedRecentAudioComponents } from "./recent-audio-animated";
 
 export function RecentAudioSection() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const recentAudio = useQuery(api.audio.getRecentAudioAnalyses);
 
-  // If loading, show nothing yet
   if (isLoading) return null;
 
-  // If not authenticated, show login message
   if (!isAuthenticated) {
     return (
       <section id="recent-audio" className="py-8">
-        <Card className="border shadow-sm bg-muted/10">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-center md:text-left">
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Access Your Analysis History
-                </h3>
-                <p className="text-muted-foreground mb-2">
-                  Sign in to save your analyses and access them anytime
-                </p>
+        <AnimatedCard>
+          <Card className="border shadow-sm bg-muted/10">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <AnimatedFadeInContainer>
+                  <div className="text-center md:text-left">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Access Your Analysis History
+                    </h3>
+                    <p className="text-muted-foreground mb-2">
+                      Sign in to save your analyses and access them anytime
+                    </p>
+                  </div>
+                </AnimatedFadeInContainer>
+                <AnimatedButtonContainer>
+                  <LoginButton />
+                </AnimatedButtonContainer>
               </div>
-              <LoginButton />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </AnimatedCard>
       </section>
     );
   }
 
-  // If authenticated but no recordings, show empty state
   if (!recentAudio || recentAudio.length === 0) {
     return (
       <section id="recent-audio" className="py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-foreground">
-            Recent Analyses
-          </h2>
-        </div>
-        <Card className="bg-accent/10">
-          <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground">
-              You haven&apos;t analyzed any audio files yet
-            </p>
-          </CardContent>
-        </Card>
+        <AnimatedSectionHeading className="text-2xl font-bold text-foreground mb-6">
+          Recent Analyses
+        </AnimatedSectionHeading>
+        <AnimatedCard>
+          <Card className="bg-accent/10">
+            <CardContent className="p-6 text-center">
+              <p className="text-muted-foreground">
+                You haven&apos;t analyzed any audio files yet
+              </p>
+            </CardContent>
+          </Card>
+        </AnimatedCard>
       </section>
     );
   }
 
-  // Show recent audio files
   return (
     <section id="recent-audio" className="py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-foreground">Recent Analyses</h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/history" className="flex items-center">
-            View all
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
+        <AnimatedSectionHeading className="text-2xl font-bold text-foreground m-0">
+          Recent Analyses
+        </AnimatedSectionHeading>
+        <AnimatedRecentAudioComponents.ViewAllButton>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/history" className="flex items-center">
+              View all
+              <AnimatedRecentAudioComponents.ArrowIcon>
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </AnimatedRecentAudioComponents.ArrowIcon>
+            </Link>
+          </Button>
+        </AnimatedRecentAudioComponents.ViewAllButton>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {recentAudio.map((audio) => {
+        {recentAudio.map((audio, index) => {
           const date = new Date(audio.analysisDate);
           const formattedDate = new Intl.DateTimeFormat("en-US", {
             year: "numeric",
@@ -82,30 +97,38 @@ export function RecentAudioSection() {
           }).format(date);
 
           return (
-            <Card
+            <AnimatedCard
               key={audio._id}
-              className="overflow-hidden hover:shadow-md transition-shadow"
+              index={index}
+              whileHover={{
+                y: -5,
+                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+              }}
             >
-              <CardContent className="p-4">
-                <div className="mb-2 text-lg font-medium line-clamp-1">
-                  {audio.title}
-                </div>
-                <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-                  {audio.summary.substring(0, 120)}...
-                </p>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {formattedDate}
+              <Card className="overflow-hidden transition-shadow h-full">
+                <CardContent className="p-4">
+                  <AnimatedRecentAudioComponents.CardTitle index={index}>
+                    {audio.title}
+                  </AnimatedRecentAudioComponents.CardTitle>
+                  <AnimatedRecentAudioComponents.CardDescription index={index}>
+                    {audio.summary.substring(0, 120)}...
+                  </AnimatedRecentAudioComponents.CardDescription>
+                  <div className="flex justify-between items-center">
+                    <AnimatedRecentAudioComponents.CardDate index={index}>
+                      <Clock className="h-3 w-3 mr-1" />
+                      {formattedDate}
+                    </AnimatedRecentAudioComponents.CardDate>
+                    <AnimatedRecentAudioComponents.ViewButton index={index}>
+                      <Button size="sm" asChild>
+                        <Link href={`/result/${audio.url.split("/").pop()}`}>
+                          View Results
+                        </Link>
+                      </Button>
+                    </AnimatedRecentAudioComponents.ViewButton>
                   </div>
-                  <Button size="sm" asChild>
-                    <Link href={`/result/${audio.url.split("/").pop()}`}>
-                      View Results
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </AnimatedCard>
           );
         })}
       </div>

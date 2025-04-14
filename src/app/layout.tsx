@@ -9,9 +9,8 @@ import { AuthProvider } from "@/providers/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MeetingScribe | AI Meeting Transcription & Notes",
-  description:
-    "Transform audio recordings into high-quality meeting notes with AI transcription and analysis",
+  title: "MeetingScribe | AI Meeting Notes",
+  description: "Transform audio recordings into meeting notes with AI analysis",
 };
 
 export default function RootLayout({
