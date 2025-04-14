@@ -2,7 +2,7 @@
 
 import { useRef, useCallback, useEffect } from "react";
 
-export default function VideoPlayer({ videoId }: { videoId: string }) {
+export default function VideoPlayer({ audioId }: { audioId: string }) {
   const playerRef = useRef<HTMLIFrameElement>(null);
 
   const handleSeek = useCallback((seconds: number) => {
@@ -40,7 +40,7 @@ export default function VideoPlayer({ videoId }: { videoId: string }) {
     <div className="aspect-video w-full mb-6 rounded-xl overflow-hidden shadow-lg">
       <iframe
         ref={playerRef}
-        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
+        src={`https://www.youtube.com/embed/${audioId}?enablejsapi=1`}
         className="w-full h-full"
         allowFullScreen
         title="Youtube Video"

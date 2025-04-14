@@ -20,15 +20,15 @@ export function RecentAudioSection() {
   if (!isAuthenticated) {
     return (
       <section id="recent-audio" className="py-8">
-        <Card className="border-blue-300 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+        <Card className="border shadow-sm bg-muted/10">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-center md:text-left">
-                <h3 className="text-xl font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   Access Your Analysis History
                 </h3>
-                <p className="text-blue-600 dark:text-blue-400 mb-2">
-                  Log in to save your analyses and access them anytime
+                <p className="text-muted-foreground mb-2">
+                  Sign in to save your analyses and access them anytime
                 </p>
               </div>
               <LoginButton />

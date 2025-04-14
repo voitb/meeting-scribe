@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { audioId: string } }
 ) {
   try {
-    const { audioId } = params;
+    const { audioId } = await params;
     if (!audioId) {
       return NextResponse.json(
         { error: "Audio ID is required" },

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
-
-// Directory for storing transcriptions
-const TRANSCRIPTIONS_DIR = path.join(process.cwd(), "transcriptions");
+import { getTranscriptionsDir } from "@/lib/transcription-manager";
 
 export async function GET(
   request: NextRequest,
@@ -21,51 +19,89 @@ export async function GET(
 
     console.log(`Fetching metadata for audio ID: ${audioId}`);
 
+    // Get transcriptions directory
+    const transcriptionsDir = await getTranscriptionsDir();
+
     // Path to transcription file which contains metadata
-    const transcriptionFilePath = path.join(TRANSCRIPTIONS_DIR, `${audioId}.json`);
+    const transcriptionFilePath = path.join(transcriptionsDir, `${audioId}.json`);
     
-    // Check if transcription file exists
+    // Przygotuj domyślne metadane na wypadek braku pliku
+    const defaultMetadata = {
+      audioId,
+      originalFileName: `recording-${audioId}.mp3`,
+      metadata: {
+        duration: 0,
+        language: 'en',
+        processingDate: new Date().toISOString(),
+        fileSize: 0
+      }
+    };
+    
     try {
-      await fs.access(transcriptionFilePath);
-      
-      // Read file to get metadata
-      const transcriptionData = await fs.readFile(transcriptionFilePath, 'utf-8');
-      const transcription = JSON.parse(transcriptionData);
-      
-      // Extract original filename from metadata if available
-      let originalFileName = null;
-      
-      if (transcription.metadata && transcription.metadata.originalFileName) {
-        originalFileName = transcription.metadata.originalFileName;
-      } else if (transcription.audioDetails && transcription.audioDetails.originalFileName) {
-        originalFileName = transcription.audioDetails.originalFileName;
+      // Sprawdź, czy plik istnieje bez rzucania wyjątku przy jego braku
+      let fileExists = false;
+      try {
+        await fs.access(transcriptionFilePath);
+        fileExists = true;
+      } catch {
+        console.log(`Transcription file not found: ${transcriptionFilePath}, returning default metadata`);
+        return NextResponse.json(defaultMetadata);
       }
       
-      console.log(`Retrieved original filename for ${audioId}: ${originalFileName || 'not found'}`);
-      
-      return NextResponse.json({
-        audioId,
-        originalFileName: originalFileName || `recording-${audioId}.mp3`,
-        metadata: {
-          duration: transcription.duration || 0,
-          language: transcription.language || 'en',
-          processingDate: transcription.metadata?.processingDate || new Date().toISOString(),
-          fileSize: transcription.metadata?.fileSize || 0
+      if (fileExists) {
+        // Read file to get metadata
+        const transcriptionData = await fs.readFile(transcriptionFilePath, 'utf-8');
+        const transcription = JSON.parse(transcriptionData);
+        
+        // Extract original filename from metadata if available
+        let originalFileName = null;
+        
+        if (transcription.metadata && transcription.metadata.originalFileName) {
+          originalFileName = transcription.metadata.originalFileName;
+        } else if (transcription.audioDetails && transcription.audioDetails.originalFileName) {
+          originalFileName = transcription.audioDetails.originalFileName;
         }
-      });
-      
+        
+        console.log(`Retrieved original filename for ${audioId}: ${originalFileName || 'not found'}`);
+        
+        return NextResponse.json({
+          audioId,
+          originalFileName: originalFileName || `recording-${audioId}.mp3`,
+          metadata: {
+            duration: transcription.duration || 0,
+            language: transcription.language || 'en',
+            processingDate: transcription.metadata?.processingDate || new Date().toISOString(),
+            fileSize: transcription.metadata?.fileSize || 0
+          }
+        });
+      }
     } catch (err) {
-      console.error(`Metadata file not found for: ${audioId}`, err);
-      return NextResponse.json(
-        { error: "Metadata not found" },
-        { status: 404 }
-      );
+      // Obsługa innych błędów poza brakiem pliku
+      console.error(`Error processing metadata for: ${audioId}`, err);
+      // Zwróć domyślne metadane zamiast błędu
+      return NextResponse.json(defaultMetadata);
     }
+    
+    // Jeśli coś poszło nie tak, ale nie złapaliśmy konkretnego błędu
+    return NextResponse.json(defaultMetadata);
+    
   } catch (error) {
+    // W tym bloku catch używamy domyślnej wartości id, ponieważ nie możemy odzyskać audioId
+    const id = "unknown";
+    
     console.error("Error retrieving audio metadata:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve audio metadata" },
-      { status: 500 }
+      { 
+        audioId: id,
+        originalFileName: `recording-${id}.mp3`,
+        metadata: {
+          duration: 0,
+          language: 'en',
+          processingDate: new Date().toISOString(),
+          fileSize: 0
+        },
+        error: "Error processing metadata request"
+      }
     );
   }
 } 

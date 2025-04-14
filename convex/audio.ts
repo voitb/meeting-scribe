@@ -34,6 +34,7 @@ export const addAudioAnalysis = mutation({
     title: v.string(),
     summary: v.string(),
     keyPoints: v.array(v.string()),
+    meetingOutcomes: v.array(v.string()),
     audioChapters: v.array(v.object({
       startTime: v.string(),
       endTime: v.string(),  
@@ -407,4 +408,82 @@ export const getAudioBlobPublic = query({
       size: analysis.audioSize
     };
   }
+});
+
+// Update existing analysis or create new if not exists
+export const updateAudioAnalysis = mutation({
+  args: {
+    url: v.string(),
+    title: v.string(),
+    summary: v.string(),
+    keyPoints: v.array(v.string()),
+    meetingOutcomes: v.array(v.string()),
+    audioChapters: v.array(v.object({
+      startTime: v.string(),
+      endTime: v.string(),  
+      title: v.string(),
+      description: v.string(),
+    })),
+    presentationQuality: v.object({
+      overallClarity: v.string(),
+      difficultSegments: v.array(v.object({
+          startTime: v.string(),
+          endTime: v.string(), 
+          issue: v.string(),
+          improvement: v.string(),
+      })),
+      improvementSuggestions: v.array(v.string())
+    }),
+    glossary: v.record(v.string(), v.string()),
+    analysisDate: v.string()
+  },
+  handler: async (ctx, args) => {
+    // Check if the user is authenticated
+    const isAuthenticated = await isUserAuthenticated(ctx);
+    
+    // If the user is not logged in, don't save/update the analysis
+    if (!isAuthenticated) {
+      console.log("User not logged in - analysis will not be updated");
+      return null;
+    }
+    
+    const userId = await getUserId(ctx);
+    
+    // If we don't have a userId, abort
+    if (!userId) {
+      console.log("No user ID found - analysis will not be updated");
+      return null;
+    }
+    
+    console.log(`Looking for existing analysis with URL ${args.url} for user ${userId}`);
+    
+    // Check if entry already exists
+    const existingAnalysis = await ctx.db
+      .query("audioAnalysis")
+      .withIndex("by_url", (q) => q.eq("url", args.url))
+      .filter(q => q.eq(q.field("userId"), userId))
+      .first();
+    
+    if (existingAnalysis) {
+      console.log(`Updating existing analysis with ID ${existingAnalysis._id}`);
+      
+      // Update the existing entry
+      await ctx.db.patch(existingAnalysis._id, {
+        ...args,
+        userId
+      });
+      
+      return existingAnalysis._id;
+    } else {
+      console.log(`No existing analysis found, creating new entry`);
+      
+      // Create a new entry
+      const analysisId = await ctx.db.insert("audioAnalysis", {
+        ...args,
+        userId
+      });
+      
+      return analysisId;
+    }
+  },
 });

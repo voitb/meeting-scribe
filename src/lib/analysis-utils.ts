@@ -1,9 +1,9 @@
 import type { Transcription, VideoAnalysisResult, ParsedAIResponse,} from '@/types/analysis.types'
 
-// --- Funkcje do czyszczenia i parsowania odpowiedzi AI ---
+// --- Functions for cleaning and parsing AI responses ---
 
 /**
- * Czyści odpowiedź tekstową z AI, próbując wyizolować i sparsować blok JSON.
+ * Cleans the text response from AI, attempting to isolate and parse the JSON block.
  */
 export async function cleanAndParseAIResponse(responseText: string): Promise<ParsedAIResponse | null> {
   console.log("Attempting to clean and parse AI response...");
@@ -59,7 +59,7 @@ export async function cleanAndParseAIResponse(responseText: string): Promise<Par
 }
 
 /**
- * Próbuje naprawić typowe błędy w stringu JSON.
+ * Attempts to fix common errors in JSON string.
  */
 function attemptToFixJsonStructure(jsonString: string): string {
   let result = jsonString.trim();
@@ -88,10 +88,10 @@ function attemptToFixJsonStructure(jsonString: string): string {
 }
 
 
-// --- Funkcje do dzielenia transkrypcji i łączenia wyników ---
+// --- Functions for splitting transcriptions and combining results ---
 
 /**
- * Dzieli długą transkrypcję na mniejsze części, uwzględniając limit segmentów i długość tekstu.
+ * Splits a long transcription into smaller parts, considering segment limit and text length.
  */
 export function splitTranscriptionIntoChunks(transcription: Transcription, maxSegmentsPerChunk: number = 50, maxTextLengthPerChunk: number = 15000): Transcription[] {
   if (!transcription.segments || transcription.segments.length === 0) {
@@ -173,7 +173,7 @@ export function splitTranscriptionIntoChunks(transcription: Transcription, maxSe
 }
 
 /**
- * Łączy wyniki analizy z wielu części transkrypcji w jeden spójny wynik.
+ * Combines analysis results from multiple transcription parts into one coherent result.
  */
 export function mergeAnalysisResults(results: VideoAnalysisResult[], originalTitle: string): VideoAnalysisResult {
   if (!results || results.length === 0) {

@@ -15,7 +15,7 @@ export function LoginButton() {
     <SignInButton mode="modal">
       <Button variant="outline" className="gap-2">
         <LogIn size={16} />
-        Log in
+        Sign in
       </Button>
     </SignInButton>
   );

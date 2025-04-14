@@ -1,15 +1,18 @@
-# YouTube Analyzer
+# MeetingScribe
 
-Aplikacja webowa pozwalająca na analizę zawartości filmów z YouTube poprzez transkrypcję audio i analizę tekstu.
+Aplikacja webowa pozwalająca na analizę nagrań audio i wideo poprzez transkrypcję i generowanie inteligentnych notatek ze spotkań.
 
 ## Funkcjonalności
 
-- Pobieranie audio z filmów YouTube (bez zapisywania plików lokalnie)
+- Obsługa plików audio (MP3, WAV, OGG, M4A, WEBM)
+- Obsługa plików wideo (MP4, MKV, WEBM, MOV)
 - Transkrypcja audio przy użyciu Whisper przez Groq API
 - Analiza tekstu (Groq API) generująca:
-  - Krótkie streszczenie (1-2 akapity)
+  - Szczegółowe streszczenie
   - Najważniejsze punkty (bullet points)
-  - Potencjalne pytania do dyskusji
+  - Podział na rozdziały
+  - Słowniczek pojęć
+  - Zadania do wykonania
 - Eksport wyników do PDF
 
 ## Technologie
@@ -18,7 +21,9 @@ Aplikacja webowa pozwalająca na analizę zawartości filmów z YouTube poprzez 
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
-- ytdl-core (pobieranie audio z YouTube)
+- Clerk (autentykacja)
+- Convex (backend i baza danych)
+- ffmpeg (przetwarzanie wideo)
 - Groq API (Whisper i LLM)
 - pdfkit (generowanie PDF)
 
@@ -26,7 +31,31 @@ Aplikacja webowa pozwalająca na analizę zawartości filmów z YouTube poprzez 
 
 - Node.js (v18+)
 - pnpm
+- ffmpeg (do przetwarzania plików wideo)
 - Klucz API Groq
+- Konto Clerk (autentykacja)
+- Konto Convex (backend)
+
+## Instalacja ffmpeg
+
+### Windows
+
+1. Pobierz ffmpeg ze strony https://ffmpeg.org/download.html
+2. Rozpakuj do wybranego folderu
+3. Dodaj ścieżkę do folderu bin do zmiennej środowiskowej PATH
+
+### MacOS
+
+```bash
+brew install ffmpeg
+```
+
+### Linux (Ubuntu/Debian)
+
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
 
 ## Instalacja
 
@@ -34,7 +63,7 @@ Aplikacja webowa pozwalająca na analizę zawartości filmów z YouTube poprzez 
 
 ```bash
 git clone <repo-url>
-cd youtube-analyzer
+cd meetingscribe
 ```
 
 2. Zainstaluj zależności:
@@ -43,10 +72,13 @@ cd youtube-analyzer
 pnpm install
 ```
 
-3. Utwórz plik `.env.local` i dodaj swój klucz API Groq:
+3. Utwórz plik `.env.local` i dodaj swoje klucze API:
 
 ```
 GROQ_API_KEY=twój_klucz_api_groq
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=twój_klucz_clerk
+CLERK_SECRET_KEY=twój_sekretny_klucz_clerk
+NEXT_PUBLIC_CONVEX_URL=twój_url_convex
 ```
 
 ## Uruchomienie aplikacji
@@ -54,7 +86,7 @@ GROQ_API_KEY=twój_klucz_api_groq
 Uruchom serwer deweloperski:
 
 ```bash
-pnpm dev
+pnpm dev:all
 ```
 
 Aplikacja będzie dostępna pod adresem [http://localhost:3000](http://localhost:3000).
@@ -73,15 +105,10 @@ pnpm build
 pnpm start
 ```
 
-## Wdrożenie na VPS (Docker + Coolify)
+## Limity plików
 
-Aplikacja może być łatwo wdrożona na serwerze VPS za pomocą Coolify:
-
-1. Skonfiguruj Coolify na swoim VPS
-2. Utwórz nowy projekt w Coolify
-3. Połącz repozytorium git
-4. Skonfiguruj zmienną środowiskową `GROQ_API_KEY`
-5. Wdróż aplikację
+- Audio: do 10MB (MP3, WAV, OGG, M4A, WEBM)
+- Wideo: do 25MB (MP4, MKV, WEBM, MOV)
 
 ## Licencja
 

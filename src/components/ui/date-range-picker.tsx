@@ -114,9 +114,9 @@ export function DatePickerWithRange({
         </div>
         <PopoverContent
           ref={contentRef}
-          style={{ width: `${Math.max(width, 280)}px` }}
-          className="p-0 justify-center"
-          align="start"
+          style={{ width: `${Math.max(width, 300)}px` }}
+          className="flex justify-center items-center p-0"
+          align="center"
         >
           <Calendar
             initialFocus
@@ -130,7 +130,7 @@ export function DatePickerWithRange({
               }
             }}
             numberOfMonths={numberOfMonths}
-            className="w-full"
+            className="mx-auto"
           />
         </PopoverContent>
       </Popover>

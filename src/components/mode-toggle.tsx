@@ -2,10 +2,10 @@
 
 import { ThemeToggle } from "@/components/theme-toggle";
 
-// Ten komponent jest aliasem do ThemeToggle, aby zachować kompatybilność z istniejącymi importami
+// This component is an alias for ThemeToggle to maintain compatibility with existing imports
 export function ModeToggle() {
   return <ThemeToggle />;
 }
 
-// Eksportujemy również domyślnie, aby umożliwić różne sposoby importu
+// We also export it as default to allow different import methods
 export default ModeToggle;

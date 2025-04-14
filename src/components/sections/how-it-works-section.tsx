@@ -11,15 +11,15 @@ const featureItems = [
   },
   {
     icon: <ListTodo className="h-8 w-8 text-primary" />,
-    title: "Generate Transcription",
+    title: "Audio Analysis",
     description:
-      "The system automatically transcribes the audio file using advanced algorithms.",
+      "The system automatically analyzes the audio content using advanced AI technology.",
   },
   {
     icon: <LightbulbIcon className="h-8 w-8 text-primary" />,
-    title: "Content Analysis",
+    title: "Content Extraction",
     description:
-      "Advanced artificial intelligence analyzes the transcription, extracting key information.",
+      "Advanced artificial intelligence extracts key information and insights from the audio.",
   },
   {
     icon: <BookOpen className="h-8 w-8 text-primary" />,

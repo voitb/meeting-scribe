@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { execSync } from "child_process";
 
 export const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -85,4 +86,60 @@ export async function withRetry<T>(
   }
   
   throw new Error(`Unexpected error during operation ${operationName}`);
-} 
+}
+
+export async function extractAudioFromVideo(videoPath: string, outputAudioPath: string): Promise<string> {
+  if (!fs.existsSync(videoPath)) {
+    throw new Error(`Video file does not exist: ${videoPath}`);
+  }
+
+  try {
+    // Check if ffmpeg is available
+    console.log("Checking if ffmpeg is available...");
+    try {
+      execSync("ffmpeg -version", { stdio: 'ignore' });
+    } catch (error) {
+      console.error("ffmpeg is not found on the system path", error);
+      throw new Error("ffmpeg is required to extract audio from video but it was not found");
+    }
+
+    // Use ffmpeg to extract audio track
+    console.log(`Extracting audio from ${videoPath} to ${outputAudioPath}...`);
+    
+    const ffmpegCommand = `ffmpeg -i "${videoPath}" -q:a 0 -map a "${outputAudioPath}" -y`;
+    execSync(ffmpegCommand, { stdio: 'inherit' });
+
+    if (!fs.existsSync(outputAudioPath)) {
+      throw new Error(`Failed to extract audio: output file not found ${outputAudioPath}`);
+    }
+
+    const audioFileStats = fs.statSync(outputAudioPath);
+    if (audioFileStats.size === 0) {
+      throw new Error("Extracted audio file is empty");
+    }
+
+    console.log(`Successfully extracted audio to ${outputAudioPath} (size: ${audioFileStats.size} bytes)`);
+    return outputAudioPath;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error extracting audio from video: ${errorMessage}`);
+    
+    // In case of ffmpeg error, try alternative method - e.g. extracting only the first audio track
+    if (errorMessage.includes("ffmpeg")) {
+      try {
+        console.log("Trying alternative method for audio extraction...");
+        const alternativeCommand = `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame -q:a 2 "${outputAudioPath}" -y`;
+        execSync(alternativeCommand, { stdio: 'inherit' });
+        
+        if (fs.existsSync(outputAudioPath) && fs.statSync(outputAudioPath).size > 0) {
+          console.log(`Successfully extracted audio using alternative method to ${outputAudioPath}`);
+          return outputAudioPath;
+        }
+      } catch (altError) {
+        console.error("Alternative method also failed:", altError);
+      }
+    }
+    
+    throw new Error(`Failed to extract audio from video: ${errorMessage}`);
+  }
+}
