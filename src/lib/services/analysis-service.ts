@@ -1,9 +1,18 @@
-import { groq } from '@ai-sdk/groq';
-import { generateText } from 'ai';
-import { cleanAndParseAIResponse, splitTranscriptionIntoChunks, mergeAnalysisResults, formatTime } from '../analysis-utils';
-import { VideoAnalysisResult } from '@/types/analysis.types';
-import { Transcription } from '@/types/analysis.types';
-import { markAsCompleted, markAsError, updateChunkProgress } from '../progress-store';
+import { groq } from "@ai-sdk/groq";
+import { generateText } from "ai";
+import {
+	cleanAndParseAIResponse,
+	splitTranscriptionIntoChunks,
+	mergeAnalysisResults,
+	formatTime,
+} from "../analysis-utils";
+import { VideoAnalysisResult } from "@/types/analysis.types";
+import { Transcription } from "@/types/analysis.types";
+import {
+	markAsCompleted,
+	markAsError,
+	updateChunkProgress,
+} from "../progress-store";
 
 // --- Main analysis function ---
 
@@ -12,73 +21,104 @@ import { markAsCompleted, markAsError, updateChunkProgress } from '../progress-s
  * sending to AI and combining the results.
  */
 export async function analyzeTranscription(
-  title: string,
-  transcription: Transcription,
-  outputLanguage: string = "english",
-  audioId?: string // ID for tracking progress
+	title: string,
+	transcription: Transcription,
+	outputLanguage: string = "english",
+	audioId?: string // ID for tracking progress
 ): Promise<VideoAnalysisResult> {
-  const operationId = audioId || `analysis-${Date.now()}`; // Use provided ID or generate one
-  console.log(`[${operationId}] Starting transcription analysis for "${title}"...`);
+	const operationId = audioId || `analysis-${Date.now()}`; // Use provided ID or generate one
+	console.log(
+		`[${operationId}] Starting transcription analysis for "${title}"...`
+	);
 
-  try {
-    if (!transcription || !transcription.segments || transcription.segments.length === 0) {
-        console.warn(`[${operationId}] Transcription has no segments. Returning minimal result.`);
-        markAsCompleted(operationId, "Analysis completed (no segments)");
-        return createEmptyResult(title, "Transcription contains no segments.");
-    }
+	try {
+		if (
+			!transcription ||
+			!transcription.segments ||
+			transcription.segments.length === 0
+		) {
+			console.warn(
+				`[${operationId}] Transcription has no segments. Returning minimal result.`
+			);
+			markAsCompleted(operationId, "Analysis completed (no segments)");
+			return createEmptyResult(title, "Transcription contains no segments.");
+		}
 
-    console.log(`[${operationId}] Total segments: ${transcription.segments.length}, Total text length: ${transcription.text?.length || 0} chars`);
+		console.log(
+			`[${operationId}] Total segments: ${transcription.segments.length}, Total text length: ${transcription.text?.length || 0} chars`
+		);
 
-    // Using utilities function to split into parts
-    const MAX_SEGMENTS_PER_CHUNK = 50; // Can be adjusted
-    const MAX_TEXT_LENGTH_PER_CHUNK = 15000; // Character limit per part (safe margin)
-    const chunks = splitTranscriptionIntoChunks(transcription, MAX_SEGMENTS_PER_CHUNK, MAX_TEXT_LENGTH_PER_CHUNK);
-    const totalChunks = chunks.length;
+		// Using utilities function to split into parts
+		const MAX_SEGMENTS_PER_CHUNK = 50; // Can be adjusted
+		const MAX_TEXT_LENGTH_PER_CHUNK = 15000; // Character limit per part (safe margin)
+		const chunks = splitTranscriptionIntoChunks(
+			transcription,
+			MAX_SEGMENTS_PER_CHUNK,
+			MAX_TEXT_LENGTH_PER_CHUNK
+		);
+		const totalChunks = chunks.length;
 
-    if (totalChunks === 0) {
-        console.error(`[${operationId}] Splitting resulted in zero chunks. Cannot proceed.`);
-        markAsError(operationId, "Error: Failed to split transcription into chunks.");
-        return createEmptyResult(title, "Error during transcription splitting.");
-    }
+		if (totalChunks === 0) {
+			console.error(
+				`[${operationId}] Splitting resulted in zero chunks. Cannot proceed.`
+			);
+			markAsError(
+				operationId,
+				"Error: Failed to split transcription into chunks."
+			);
+			return createEmptyResult(title, "Error during transcription splitting.");
+		}
 
-    console.log(`[${operationId}] Split into ${totalChunks} chunk(s) for analysis.`);
+		console.log(
+			`[${operationId}] Split into ${totalChunks} chunk(s) for analysis.`
+		);
 
-    const analysisPromises: Promise<VideoAnalysisResult>[] = [];
+		const analysisPromises: Promise<VideoAnalysisResult>[] = [];
 
-    for (let i = 0; i < totalChunks; i++) {
-      const chunk = chunks[i];
-      const chunkNumber = i + 1;
+		for (let i = 0; i < totalChunks; i++) {
+			const chunk = chunks[i];
+			const chunkNumber = i + 1;
 
-      // Starting asynchronous analysis for each part
-      analysisPromises.push(
-        analyzeTranscriptionChunk(
-          title, // Passing original title
-          chunk,
-          outputLanguage,
-          operationId,
-          chunkNumber,
-          totalChunks
-        )
-      );
-    }
+			// Starting asynchronous analysis for each part
+			analysisPromises.push(
+				analyzeTranscriptionChunk(
+					title, // Passing original title
+					chunk,
+					outputLanguage,
+					operationId,
+					chunkNumber,
+					totalChunks
+				)
+			);
+		}
 
-    // Waiting for all analyses to complete
-    const results = await Promise.all(analysisPromises);
+		// Waiting for all analyses to complete
+		const results = await Promise.all(analysisPromises);
 
-    // Combining results
-    console.log(`[${operationId}] Merging results from ${results.length} chunk(s)...`);
-    const mergedResult = mergeAnalysisResults(results, title); // Using utility function
+		// Combining results
+		console.log(
+			`[${operationId}] Merging results from ${results.length} chunk(s)...`
+		);
+		const mergedResult = mergeAnalysisResults(results, title); // Using utility function
 
-    markAsCompleted(operationId, "Analysis completed successfully");
-    console.log(`[${operationId}] Analysis finished successfully.`);
-    return mergedResult;
-
-  } catch (error) {
-    console.error(`[${operationId}] Critical error during analyzeTranscription:`, error);
-    markAsError(operationId, `Analysis failed: ${error instanceof Error ? error.message : String(error)}`);
-    // Returning empty result with error information
-    return createEmptyResult(title, `Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+		markAsCompleted(operationId, "Analysis completed successfully");
+		console.log(`[${operationId}] Analysis finished successfully.`);
+		return mergedResult;
+	} catch (error) {
+		console.error(
+			`[${operationId}] Critical error during analyzeTranscription:`,
+			error
+		);
+		markAsError(
+			operationId,
+			`Analysis failed: ${error instanceof Error ? error.message : String(error)}`
+		);
+		// Returning empty result with error information
+		return createEmptyResult(
+			title,
+			`Analysis failed: ${error instanceof Error ? error.message : "Unknown error"}`
+		);
+	}
 }
 
 // --- Function analyzing a single transcription part ---
@@ -87,80 +127,142 @@ export async function analyzeTranscription(
  * Analyzes a single transcription part by sending it to AI.
  */
 async function analyzeTranscriptionChunk(
-  title: string, // Original title is needed for context but doesn't have to be in AI result
-  transcriptionChunk: Transcription,
-  outputLanguage: string,
-  operationId: string, // Using operation ID for logging and progress
-  currentChunk: number,
-  totalChunks: number
+	title: string, // Original title is needed for context but doesn't have to be in AI result
+	transcriptionChunk: Transcription,
+	outputLanguage: string,
+	operationId: string, // Using operation ID for logging and progress
+	currentChunk: number,
+	totalChunks: number
 ): Promise<VideoAnalysisResult> {
-  const chunkLabel = `Chunk ${currentChunk}/${totalChunks}`;
-  console.log(`[${operationId}] [${chunkLabel}] Starting analysis...`);
+	const chunkLabel = `Chunk ${currentChunk}/${totalChunks}`;
+	console.log(`[${operationId}] [${chunkLabel}] Starting analysis...`);
 
-  try {
-    updateChunkProgress(operationId, currentChunk, totalChunks, 10, `Preparing ${chunkLabel}`);
+	try {
+		updateChunkProgress(
+			operationId,
+			currentChunk,
+			totalChunks,
+			10,
+			`Preparing ${chunkLabel}`
+		);
 
-    // Creating prompt using dedicated function
-    const prompt = createAnalysisPrompt(transcriptionChunk);
-    console.log(`[${operationId}] [${chunkLabel}] Prompt created (length: ${prompt.length}).`);
+		// Creating prompt using dedicated function
+		const prompt = createAnalysisPrompt(transcriptionChunk);
+		console.log(
+			`[${operationId}] [${chunkLabel}] Prompt created (length: ${prompt.length}).`
+		);
 
-    if (prompt.length > 32000) { // Additional check, just in case
-        console.warn(`[${operationId}] [${chunkLabel}] Prompt is very long (${prompt.length}). Potential issues.`);
-    }
+		if (prompt.length > 32000) {
+			// Additional check, just in case
+			console.warn(
+				`[${operationId}] [${chunkLabel}] Prompt is very long (${prompt.length}). Potential issues.`
+			);
+		}
 
-    updateChunkProgress(operationId, currentChunk, totalChunks, 30, `Sending ${chunkLabel} to AI`);
+		updateChunkProgress(
+			operationId,
+			currentChunk,
+			totalChunks,
+			30,
+			`Sending ${chunkLabel} to AI`
+		);
 
-    // AI call
-    const { text: analysisResponse } = await generateText({
-      model: groq('llama-3.3-70b-specdec'), // Make sure the model is appropriate
-      prompt: prompt,
-      temperature: 0.3, // Slightly higher temperature may give more varied results
-      maxTokens: 4096, // Increase if expecting longer JSON responses
-    });
+		// AI call
+		const { text: analysisResponse } = await generateText({
+			model: groq("llama3-70b-8192"), // Make sure the model is appropriate
+			prompt: prompt,
+			temperature: 0.3, // Slightly higher temperature may give more varied results
+			maxTokens: 4096, // Increase if expecting longer JSON responses
+		});
 
-    console.log(`[${operationId}] [${chunkLabel}] Received response from AI.`);
-    updateChunkProgress(operationId, currentChunk, totalChunks, 70, `Processing ${chunkLabel} response`);
+		console.log(`[${operationId}] [${chunkLabel}] Received response from AI.`);
+		updateChunkProgress(
+			operationId,
+			currentChunk,
+			totalChunks,
+			70,
+			`Processing ${chunkLabel} response`
+		);
 
-    // Parsing response using utility function
-    const parsedResponse = await cleanAndParseAIResponse(analysisResponse);
+		// Parsing response using utility function
+		const parsedResponse = await cleanAndParseAIResponse(analysisResponse);
 
-    if (!parsedResponse) {
-      console.error(`[${operationId}] [${chunkLabel}] Failed to parse AI response.`);
-      updateChunkProgress(operationId, currentChunk, totalChunks, 100, `Error processing ${chunkLabel}`);
-      // Return empty result for this part to avoid blocking the whole
-      return createEmptyResult(title, `Failed to parse AI response for chunk ${currentChunk}.`);
-    }
+		if (!parsedResponse) {
+			console.error(
+				`[${operationId}] [${chunkLabel}] Failed to parse AI response.`
+			);
+			updateChunkProgress(
+				operationId,
+				currentChunk,
+				totalChunks,
+				100,
+				`Error processing ${chunkLabel}`
+			);
+			// Return empty result for this part to avoid blocking the whole
+			return createEmptyResult(
+				title,
+				`Failed to parse AI response for chunk ${currentChunk}.`
+			);
+		}
 
-    console.log(`[${operationId}] [${chunkLabel}] Successfully parsed AI response.`);
-    updateChunkProgress(operationId, currentChunk, totalChunks, 100, `Completed ${chunkLabel}`);
+		console.log(
+			`[${operationId}] [${chunkLabel}] Successfully parsed AI response.`
+		);
+		updateChunkProgress(
+			operationId,
+			currentChunk,
+			totalChunks,
+			100,
+			`Completed ${chunkLabel}`
+		);
 
-    // Mapping parsed response to final VideoAnalysisResult type
-    // Here we assume that `parsedResponse` has a structure compatible with `ParsedAIResponse`
-    return {
-      title: title, // Using original title
-      summary: parsedResponse.summary || "No summary provided.",
-      keyPoints: parsedResponse.keyPoints || [],
-      actionItems: parsedResponse.actionItems || [],
-      decisionsMade: parsedResponse.decisionsMade || [],
-      videoChapters: parsedResponse.videoChapters || [],
-      presentationQuality: parsedResponse.presentationQuality || { overallClarity: "N/A", difficultSegments: [], improvementSuggestions: [] },
-      glossary: parsedResponse.glossary || {},
-    };
+		// Mapping parsed response to final VideoAnalysisResult type
+		// Here we assume that `parsedResponse` has a structure compatible with `ParsedAIResponse`
+		return {
+			title: title, // Using original title
+			summary: parsedResponse.summary || "No summary provided.",
+			keyPoints: parsedResponse.keyPoints || [],
+			actionItems: parsedResponse.actionItems || [],
+			decisionsMade: parsedResponse.decisionsMade || [],
+			videoChapters: parsedResponse.videoChapters || [],
+			presentationQuality: parsedResponse.presentationQuality || {
+				overallClarity: "N/A",
+				difficultSegments: [],
+				improvementSuggestions: [],
+			},
+			glossary: parsedResponse.glossary || {},
+		};
+	} catch (error) {
+		console.error(
+			`[${operationId}] [${chunkLabel}] Error during chunk analysis:`,
+			error
+		);
+		updateChunkProgress(
+			operationId,
+			currentChunk,
+			totalChunks,
+			100,
+			`Error analyzing ${chunkLabel}`
+		);
 
-  } catch (error) {
-    console.error(`[${operationId}] [${chunkLabel}] Error during chunk analysis:`, error);
-    updateChunkProgress(operationId, currentChunk, totalChunks, 100, `Error analyzing ${chunkLabel}`);
+		// Logging AI-specific error (e.g. context length)
+		if (
+			error instanceof Error &&
+			error.message.includes("context_length_exceeded")
+		) {
+			console.error(
+				`[${operationId}] [${chunkLabel}] AI context length exceeded.`
+			);
+			// Could implement retry logic with an even shorter prompt here,
+			// but for now we return an error.
+		}
 
-    // Logging AI-specific error (e.g. context length)
-     if (error instanceof Error && error.message.includes("context_length_exceeded")) {
-        console.error(`[${operationId}] [${chunkLabel}] AI context length exceeded.`);
-        // Could implement retry logic with an even shorter prompt here,
-        // but for now we return an error.
-     }
-
-    // Returning empty result with error information for this part
-    return createEmptyResult(title, `Error analyzing chunk ${currentChunk}: ${error instanceof Error ? error.message : String(error)}`);
-  }
+		// Returning empty result with error information for this part
+		return createEmptyResult(
+			title,
+			`Error analyzing chunk ${currentChunk}: ${error instanceof Error ? error.message : String(error)}`
+		);
+	}
 }
 
 // --- Function creating prompt for AI ---
@@ -170,36 +272,46 @@ async function analyzeTranscriptionChunk(
  * Forces English response and use of standard ASCII characters in JSON.
  */
 function createAnalysisPrompt(
-  transcriptionChunk: Transcription,
-  // outputLanguage: string // This parameter will no longer affect the JSON CONTENT language
+	transcriptionChunk: Transcription
+	// outputLanguage: string // This parameter will no longer affect the JSON CONTENT language
 ): string {
-  // Preparing transcription data for prompt (logic unchanged)
-  const MAX_SEGMENTS_IN_PROMPT = 150;
-  const MAX_TEXT_LENGTH_IN_PROMPT = 25000;
+	// Preparing transcription data for prompt (logic unchanged)
+	const MAX_SEGMENTS_IN_PROMPT = 150;
+	const MAX_TEXT_LENGTH_IN_PROMPT = 25000;
 
-  let segmentsForPrompt = transcriptionChunk.segments;
-  let textForPrompt = transcriptionChunk.text;
+	let segmentsForPrompt = transcriptionChunk.segments;
+	let textForPrompt = transcriptionChunk.text;
 
-  if (segmentsForPrompt.length > MAX_SEGMENTS_IN_PROMPT) {
-      console.warn(`Limiting segments in prompt from ${segmentsForPrompt.length} to ${MAX_SEGMENTS_IN_PROMPT}`);
-      const step = Math.max(1, Math.floor(segmentsForPrompt.length / MAX_SEGMENTS_IN_PROMPT));
-      segmentsForPrompt = segmentsForPrompt.filter((_, index) => index % step === 0);
-      textForPrompt = segmentsForPrompt.map(s => s.text).join(' ');
-  }
+	if (segmentsForPrompt.length > MAX_SEGMENTS_IN_PROMPT) {
+		console.warn(
+			`Limiting segments in prompt from ${segmentsForPrompt.length} to ${MAX_SEGMENTS_IN_PROMPT}`
+		);
+		const step = Math.max(
+			1,
+			Math.floor(segmentsForPrompt.length / MAX_SEGMENTS_IN_PROMPT)
+		);
+		segmentsForPrompt = segmentsForPrompt.filter(
+			(_, index) => index % step === 0
+		);
+		textForPrompt = segmentsForPrompt.map((s) => s.text).join(" ");
+	}
 
-  if (textForPrompt.length > MAX_TEXT_LENGTH_IN_PROMPT) {
-      console.warn(`Limiting text length in prompt from ${textForPrompt.length} to ${MAX_TEXT_LENGTH_IN_PROMPT}`);
-      textForPrompt = textForPrompt.substring(0, MAX_TEXT_LENGTH_IN_PROMPT) + "... [TRUNCATED]";
-  }
+	if (textForPrompt.length > MAX_TEXT_LENGTH_IN_PROMPT) {
+		console.warn(
+			`Limiting text length in prompt from ${textForPrompt.length} to ${MAX_TEXT_LENGTH_IN_PROMPT}`
+		);
+		textForPrompt =
+			textForPrompt.substring(0, MAX_TEXT_LENGTH_IN_PROMPT) + "... [TRUNCATED]";
+	}
 
-  const simplifiedSegments = segmentsForPrompt.map(s => ({
-      s: formatTime(s.start), // start time hh:mm:ss
-      e: formatTime(s.end),   // end time hh:mm:ss
-      t: s.text             // text
-  }));
+	const simplifiedSegments = segmentsForPrompt.map((s) => ({
+		s: formatTime(s.start), // start time hh:mm:ss
+		e: formatTime(s.end), // end time hh:mm:ss
+		t: s.text, // text
+	}));
 
-  // Updated prompt forcing English and standard ASCII characters
-  const prompt = `
+	// Updated prompt forcing English and standard ASCII characters
+	const prompt = `
 You are an expert meeting and lecture analyst. Your task is to analyze the provided audio transcription excerpt and generate a DETAILED and ACCURATE analysis in JSON format ONLY.
 
 **CRITICAL Analysis Requirements:**
@@ -273,20 +385,26 @@ ${textForPrompt}
 Remember: Return valid JSON ONLY, using ENGLISH language and standard ASCII characters only, and ensure that no person names or personal name references are included.
 `;
 
-
-  return prompt;
+	return prompt;
 }
 
 // --- Helper function for creating empty result in case of error ---
-function createEmptyResult(title: string, errorMessage: string): VideoAnalysisResult {
-    return {
-        title: title,
-        summary: `Analysis Error: ${errorMessage}`,
-        keyPoints: [],
-        actionItems: [],
-        decisionsMade: [],
-        videoChapters: [],
-        presentationQuality: { overallClarity: "N/A", difficultSegments: [], improvementSuggestions: [] },
-        glossary: {}
-    };
+function createEmptyResult(
+	title: string,
+	errorMessage: string
+): VideoAnalysisResult {
+	return {
+		title: title,
+		summary: `Analysis Error: ${errorMessage}`,
+		keyPoints: [],
+		actionItems: [],
+		decisionsMade: [],
+		videoChapters: [],
+		presentationQuality: {
+			overallClarity: "N/A",
+			difficultSegments: [],
+			improvementSuggestions: [],
+		},
+		glossary: {},
+	};
 }
