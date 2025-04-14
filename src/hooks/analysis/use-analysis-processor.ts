@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { toast } from "sonner";
@@ -53,52 +53,9 @@ export function useAnalysisProcessor({
   const userAnalysis = useQuery(api.audio.getAudioAnalysis, { url: audioId });
   const updateAudioAnalysis = useMutation(api.audio.updateAudioAnalysis);
 
-  useEffect(() => {
-    if (!isAuthLoading && userAnalysis !== undefined) {
-      if (
-        userAnalysis &&
-        userAnalysis.summary &&
-        userAnalysis.summary !== "Processing..."
-      ) {
-        setDataSource("database");
-        setAnalysisStatus("completed");
-        setCurrentStep(3);
+  
 
-        setTimeout(() => {
-          setResult({
-            title: userAnalysis.title || "",
-            summary: userAnalysis.summary,
-            keyPoints: userAnalysis.keyPoints || [],
-            actionItems: [],
-            decisionsMade: userAnalysis.meetingOutcomes || [],
-            videoChapters: userAnalysis.audioChapters || [],
-            presentationQuality: userAnalysis.presentationQuality || {
-              overallClarity: "",
-              difficultSegments: [],
-              improvementSuggestions: [],
-            },
-            glossary: userAnalysis.glossary || {},
-          });
-          setProcessing(false);
-          setShowResults(true);
-          setAnalysisStatus("ready");
-          setCurrentStep(3);
-        }, 1500);
-
-        setShouldRunAnalysis(false);
-      } else {
-        setShouldRunAnalysis(true);
-      }
-    }
-  }, [userAnalysis, isAuthLoading]);
-
-  useEffect(() => {
-    if (shouldRunAnalysis === true) {
-      processAudio();
-    }
-  }, [shouldRunAnalysis]);
-
-  const saveAnalysisToConvex = async (analysisResult: AnalysisResult) => {
+  const saveAnalysisToConvex = useCallback(async (analysisResult: AnalysisResult) => {
     if (!isAuthenticated) return;
 
     try {
@@ -136,9 +93,9 @@ export function useAnalysisProcessor({
     } catch {
       toast.error("Failed to save analysis to database");
     }
-  };
+  }, [isAuthenticated, audioId, updateAudioAnalysis]);
 
-  const processAudio = async () => {
+  const processAudio = useCallback(async () => {
     if (!audioId) return;
 
     try {
@@ -228,7 +185,52 @@ export function useAnalysisProcessor({
       );
       setProcessing(false);
     }
-  };
+  }, [audioId, isAuthenticated, dataSource, language, saveAnalysisToConvex]);
+
+  useEffect(() => {
+    if (!isAuthLoading && userAnalysis !== undefined) {
+      if (
+        userAnalysis &&
+        userAnalysis.summary &&
+        userAnalysis.summary !== "Processing..."
+      ) {
+        setDataSource("database");
+        setAnalysisStatus("completed");
+        setCurrentStep(3);
+
+        setTimeout(() => {
+          setResult({
+            title: userAnalysis.title || "",
+            summary: userAnalysis.summary,
+            keyPoints: userAnalysis.keyPoints || [],
+            actionItems: [],
+            decisionsMade: userAnalysis.meetingOutcomes || [],
+            videoChapters: userAnalysis.audioChapters || [],
+            presentationQuality: userAnalysis.presentationQuality || {
+              overallClarity: "",
+              difficultSegments: [],
+              improvementSuggestions: [],
+            },
+            glossary: userAnalysis.glossary || {},
+          });
+          setProcessing(false);
+          setShowResults(true);
+          setAnalysisStatus("ready");
+          setCurrentStep(3);
+        }, 1500);
+
+        setShouldRunAnalysis(false);
+      } else {
+        setShouldRunAnalysis(true);
+      }
+    }
+  }, [userAnalysis, isAuthLoading]);
+
+  useEffect(() => {
+    if (shouldRunAnalysis === true) {
+      processAudio();
+    }
+  }, [shouldRunAnalysis, processAudio]);
 
   return {
     result,
