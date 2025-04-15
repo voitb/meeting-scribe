@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CheckIcon } from "lucide-react";
+import { Loader2, CheckIcon, AlertTriangle } from "lucide-react";
 import type { AnalysisStep } from "@/types/analysis";
 import type { AnalysisStatus } from "@/types/analysis";
 
@@ -49,11 +49,23 @@ export function ProgressIndicator({
             </>
           )}
 
+          {analysisStatus === "error" && (
+            <>
+              <AlertTriangle className="h-10 w-10 text-destructive mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Processing Error</h3>
+              <p className="text-muted-foreground mb-2">
+                An issue occurred during analysis
+              </p>
+            </>
+          )}
+
           <div className="w-full max-w-md mx-auto mt-4 bg-muted h-2 rounded-full overflow-hidden">
             <div
-              className="bg-primary h-full rounded-full transition-all duration-500"
+              className={`h-full rounded-full transition-all duration-500 ${
+                analysisStatus === "error" ? "bg-destructive" : "bg-primary"
+              }`}
               style={{
-                width: `${steps[currentStep].progress}%`,
+                width: `${analysisStatus === "error" ? 100 : steps[currentStep].progress}%`,
               }}
             ></div>
           </div>

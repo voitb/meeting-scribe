@@ -105,16 +105,21 @@ export function useAnalysisProcessor({
       const transcriptionRes = await fetch(`/api/get-transcription/${audioId}`);
 
       if (!transcriptionRes.ok) {
+        const errorText = await transcriptionRes.text().catch(() => "");
         throw new Error(
-          `Failed to get transcription. Status: ${transcriptionRes.status}`
+          `Failed to fetch transcription (${transcriptionRes.status}). ${errorText ? `Details: ${errorText}` : "Please try again."}`
         );
       }
 
-      const { transcription } = await transcriptionRes.json();
+      const transcriptionData = await transcriptionRes.json().catch(() => {
+        throw new Error("Failed to process server response. Transcription data format is invalid.");
+      });
 
-      if (!transcription) {
-        throw new Error("No transcription found for this audio");
+      if (!transcriptionData.transcription) {
+        throw new Error("No transcription found for this audio file. Please try again later.");
       }
+
+      const { transcription } = transcriptionData;
 
       const metadataRes = await fetch(`/api/get-audio-metadata/${audioId}`);
       let originalFileName = null;
@@ -124,6 +129,7 @@ export function useAnalysisProcessor({
           const metadata = await metadataRes.json();
           originalFileName = metadata.originalFileName;
         } catch {
+          console.warn("Failed to read audio metadata");
           // Non-critical error, continue with default filename
         }
       }
@@ -149,15 +155,26 @@ export function useAnalysisProcessor({
       });
 
       if (!response.ok) {
-        throw new Error(`Analysis failed. Status: ${response.status}`);
+        const errorText = await response.text().catch(() => "");
+        throw new Error(
+          `Analysis failed (${response.status}). ${errorText ? `Details: ${errorText}` : "Please try again later."}`
+        );
       }
 
-      const analysisResult = await response.json();
+      const analysisResult = await response.json().catch(() => {
+        throw new Error("Failed to process server response. Analysis data format is invalid.");
+      });
+      
       setCurrentStep(3);
       setResult(analysisResult);
       setDataSource("api");
 
-      await saveAnalysisToConvex(analysisResult);
+      try {
+        await saveAnalysisToConvex(analysisResult);
+      } catch (convexError) {
+        console.error("Error saving to database:", convexError);
+        toast.error("Failed to save analysis in database, but you can still view the results");
+      }
 
       setAnalysisStatus("completed");
 
@@ -166,7 +183,8 @@ export function useAnalysisProcessor({
           setTimeout(async () => {
             await deleteTranscriptionFile(audioId);
           }, 5000);
-        } catch {
+        } catch (deleteError) {
+          console.warn("Error deleting transcription file:", deleteError);
           // Non-critical error, don't interrupt the flow
         }
       }
@@ -178,12 +196,15 @@ export function useAnalysisProcessor({
         setCurrentStep(3);
       }, 1500);
     } catch (error) {
+      console.error("Error during audio analysis:", error);
       setError(
         `An error occurred during audio analysis: ${
-          error instanceof Error ? error.message : "Unknown error"
+          error instanceof Error ? error.message : "Unknown error. Please try again."
         }`
       );
       setProcessing(false);
+      setAnalysisStatus("error");
+      toast.error("Analysis failed. Please try again.");
     }
   }, [audioId, isAuthenticated, dataSource, language, saveAnalysisToConvex]);
 

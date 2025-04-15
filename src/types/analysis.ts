@@ -30,7 +30,7 @@ export interface AnalysisResult {
   analysisDate?: string;
 }
 
-export type AnalysisStatus = "loading" | "processing" | "completed" | "ready";
+export type AnalysisStatus = "loading" | "processing" | "completed" | "ready" | "error";
 
 export interface AnalysisStep {
   name: string;
