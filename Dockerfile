@@ -57,6 +57,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Create transcriptions directory and set permissions
+RUN mkdir -p /app/transcriptions && chown -R nextjs:nodejs /app/transcriptions
+
 USER nextjs
 
 EXPOSE 3000

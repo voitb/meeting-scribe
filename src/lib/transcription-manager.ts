@@ -17,9 +17,11 @@ export async function ensureTranscriptionsDir(): Promise<void> {
   'use server';
   
   const dir = await getTranscriptionsDir();
-  if (!fs.existsSync(dir)) {
+  try {
     fs.mkdirSync(dir, { recursive: true });
-    console.log(`Created transcriptions directory: ${dir}`);
+    console.log(`Ensured transcriptions directory exists: ${dir}`);
+  } catch (error) {
+    console.error(`Error creating transcriptions directory (${dir}):`, error);
   }
 }
 
