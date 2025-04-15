@@ -3,6 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 
+// Stała określająca czas wygaśnięcia transkrypcji w milisekundach (1 godzina)
+const TRANSCRIPTION_EXPIRATION_MS = 60 * 60 * 1000;
+
 // Directory for storing transcriptions - now as private constant
 const TRANSCRIPTIONS_DIR_PATH = path.join(process.cwd(), "transcriptions");
 
@@ -192,4 +195,95 @@ function formatBytes(bytes: number, decimals: number = 2): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+/**
+ * Dodaje metadane wygaśnięcia do pliku transkrypcji
+ * @param transcriptionPath Ścieżka do pliku transkrypcji
+ * @param expirationMs Czas wygaśnięcia w milisekundach od teraz (domyślnie 1 godzina)
+ */
+export async function setTranscriptionExpiration(
+  transcriptionPath: string, 
+  expirationMs: number = TRANSCRIPTION_EXPIRATION_MS
+): Promise<void> {
+  'use server';
+  
+  try {
+    if (!fs.existsSync(transcriptionPath)) {
+      console.error(`Plik transkrypcji nie istnieje: ${transcriptionPath}`);
+      return;
+    }
+    
+    // Oblicz czas wygaśnięcia (teraz + określony czas)
+    const expirationTime = Date.now() + expirationMs;
+    
+    // Odczytaj istniejący plik JSON
+    const transcriptionContent = JSON.parse(fs.readFileSync(transcriptionPath, 'utf8'));
+    
+    // Dodaj lub zaktualizuj pole wygaśnięcia
+    transcriptionContent.metadata = {
+      ...transcriptionContent.metadata,
+      expirationTime
+    };
+    
+    // Zapisz zaktualizowaną zawartość
+    fs.writeFileSync(transcriptionPath, JSON.stringify(transcriptionContent, null, 2));
+    
+    console.log(`Ustawiono czas wygaśnięcia dla ${transcriptionPath}: ${new Date(expirationTime).toISOString()}`);
+  } catch (error) {
+    console.error(`Błąd podczas ustawiania czasu wygaśnięcia dla ${transcriptionPath}:`, error);
+  }
+}
+
+/**
+ * Czyści przeterminowane pliki transkrypcji
+ * @returns Informacje o czyszczeniu
+ */
+export async function cleanupExpiredTranscriptions(): Promise<{ 
+  deleted: number; 
+  failed: number;
+  keptCount: number;
+}> {
+  'use server';
+  
+  const files = await getTranscriptionFiles();
+  const now = Date.now();
+  
+  let deleted = 0;
+  let failed = 0;
+  let keptCount = 0;
+  
+  for (const filePath of files) {
+    try {
+      // Odczytaj plik transkrypcji
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      
+      // Sprawdź, czy plik ma metadane wygaśnięcia
+      const expirationTime = content.metadata?.expirationTime;
+      
+      if (expirationTime && expirationTime < now) {
+        // Plik wygasł - usuń go
+        try {
+          fs.unlinkSync(filePath);
+          deleted++;
+          console.log(`Usunięto wygasły plik transkrypcji: ${filePath}`);
+        } catch (e) {
+          failed++;
+          console.error(`Błąd podczas usuwania pliku transkrypcji ${filePath}:`, e);
+        }
+      } else {
+        keptCount++;
+      }
+    } catch (e) {
+      console.error(`Błąd podczas przetwarzania pliku transkrypcji ${filePath}:`, e);
+    }
+  }
+  
+  console.log(`Czyszczenie zakończone: usunięto ${deleted} plików, ${failed} błędów, pozostawiono ${keptCount}`);
+  
+  return { 
+    deleted, 
+    failed,
+    keptCount
+  };
 } 

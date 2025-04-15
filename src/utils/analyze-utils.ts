@@ -8,11 +8,10 @@ import {
 } from "@/lib/file-utils";
 import path from "path";
 import { 
-  getTranscriptionsDir, 
-  cleanupOldTranscriptions 
+  getTranscriptionsDir,
+  setTranscriptionExpiration,
+  cleanupExpiredTranscriptions
 } from "@/lib/transcription-manager";
-
-const AUTO_CLEANUP_AGE_HOURS = 48;
 
 export interface MediaFile {
   name: string;
@@ -66,7 +65,7 @@ export interface AnalysisResult {
 export async function scheduleAutoCleanup(): Promise<void> {
   setTimeout(async () => {
     try {
-      const result = await cleanupOldTranscriptions(AUTO_CLEANUP_AGE_HOURS);
+      const result = await cleanupExpiredTranscriptions();
       console.log(`Auto cleanup completed: ${result.deleted} files removed, ${result.keptCount} kept`);
     } catch (cleanupError) {
       console.error("Error during automatic transcription cleanup:", cleanupError);
@@ -78,6 +77,12 @@ export async function processMediaFile(
   mediaFile: MediaFile, 
   isVideo: boolean
 ): Promise<AnalysisResult> {
+  try {
+    await cleanupExpiredTranscriptions();
+  } catch (error) {
+    console.error("Error cleaning up expired transcriptions:", error);
+  }
+
   const originalFileName = mediaFile.name;
   console.log(`Processing ${isVideo ? 'video' : 'audio'} file: ${originalFileName}`);
 
@@ -190,6 +195,8 @@ async function saveTranscription(audioId: string, transcription: TranscriptionWi
   );
   
   console.log(`Saved transcription to file: ${transcriptionFilePath}`);
+  
+  await setTranscriptionExpiration(transcriptionFilePath);
 }
 
 function createMediaDetails(
