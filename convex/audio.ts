@@ -2,21 +2,17 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getUserId, isUserAuthenticated } from "./users";
 
-// Check if audio already exists
 export const checkAudioExists = query({
   args: { url: v.string() },
   handler: async (ctx, args) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If there is no user, the audio doesn't exist in the database (not saved)
     if (!isAuthenticated) {
       return false;
     }
     
     const userId = await getUserId(ctx);
     
-    // Check if audio belonging to this user exists
     const audio = await ctx.db
       .query("audioAnalysis")
       .withIndex("by_url", (q) => q.eq("url", args.url))
@@ -27,7 +23,6 @@ export const checkAudioExists = query({
   },
 });
 
-// Adding new analysis
 export const addAudioAnalysis = mutation({
   args: {
     url: v.string(),
@@ -55,10 +50,8 @@ export const addAudioAnalysis = mutation({
     analysisDate: v.string()
   },
   handler: async (ctx, args) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If the user is not logged in, don't save the analysis
     if (!isAuthenticated) {
       console.log("User not logged in - analysis will not be saved");
       return null;
@@ -66,7 +59,6 @@ export const addAudioAnalysis = mutation({
     
     const userId = await getUserId(ctx);
     
-    // If we don't have a userId, abort
     if (!userId) {
       console.log("No user ID found - analysis will not be saved");
       return null;
@@ -74,7 +66,6 @@ export const addAudioAnalysis = mutation({
     
     console.log(`Saving analysis for user: ${userId}`);
     
-    // Add the user ID to the analysis data
     const analysisId = await ctx.db.insert("audioAnalysis", {
       ...args,
       userId
@@ -84,21 +75,17 @@ export const addAudioAnalysis = mutation({
   },
 });
 
-// Getting analysis by URL (audio ID)
 export const getAudioAnalysis = query({
   args: { url: v.string() },
   handler: async (ctx, args) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If the user is not logged in, they don't have access to saved analyses
     if (!isAuthenticated) {
       return null;
     }
     
     const userId = await getUserId(ctx);
     
-    // Retrieve analysis belonging to the logged-in user
     return await ctx.db
       .query("audioAnalysis")
       .withIndex("by_url", (q) => q.eq("url", args.url))
@@ -107,21 +94,17 @@ export const getAudioAnalysis = query({
   },
 });
 
-// Getting all user analyses
 export const getAllAudioAnalyses = query({
   args: {},
   handler: async (ctx) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If the user is not logged in, return an empty array
     if (!isAuthenticated) {
       return [];
     }
     
     const userId = await getUserId(ctx);
     
-    // Retrieve all analyses belonging to the logged-in user
     return await ctx.db
       .query("audioAnalysis")
       .filter(q => q.eq(q.field("userId"), userId))
@@ -129,21 +112,17 @@ export const getAllAudioAnalyses = query({
   },
 });
 
-// Getting recent user analyses
 export const getRecentAudioAnalyses = query({
   args: {},
   handler: async (ctx) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If the user is not logged in, return an empty array
     if (!isAuthenticated) {
       return [];
     }
     
     const userId = await getUserId(ctx);
     
-    // Retrieve recent analyses belonging to the logged-in user
     return await ctx.db
       .query("audioAnalysis")
       .filter(q => q.eq(q.field("userId"), userId))
@@ -152,10 +131,8 @@ export const getRecentAudioAnalyses = query({
   },
 });
 
-// New endpoint for filtering audio analyses based on different criteria
 export const filterAudioAnalyses = query({
   args: {
-    // Optional filter criteria
     searchTerm: v.optional(v.string()),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
@@ -165,10 +142,8 @@ export const filterAudioAnalyses = query({
     sortDirection: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
   handler: async (ctx, args) => {
-    // Check if user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If user is not logged in, return empty result
     if (!isAuthenticated) {
       return { 
         analyses: [],
@@ -186,12 +161,10 @@ export const filterAudioAnalyses = query({
     
     const { startDate, endDate, limit = 10, skip = 0, sortBy = "analysisDate", sortDirection = "desc" } = args;
     
-    // Start building the query with user filter
     let query = ctx.db
       .query("audioAnalysis")
       .withIndex("by_user", (q) => q.eq("userId", userId));
     
-    // Apply date range filters if provided
     if (startDate) {
       query = query.filter(q => q.gte(q.field("analysisDate"), startDate));
     }
@@ -200,11 +173,8 @@ export const filterAudioAnalyses = query({
       query = query.filter(q => q.lte(q.field("analysisDate"), endDate));
     }
     
-    // Get all results to filter in memory
     const totalResults = await query.collect();
     
-    // Apply simple title matching for search term (if provided)
-    // This is a basic approach since Convex doesn't support full-text search natively
     let filteredResults = totalResults;
     if (args.searchTerm && args.searchTerm.trim() !== "") {
       const term = args.searchTerm.toLowerCase().trim();
@@ -214,7 +184,6 @@ export const filterAudioAnalyses = query({
       );
     }
     
-    // Apply sorting in memory
     filteredResults.sort((a, b) => {
       const fieldA = a[sortBy as keyof typeof a];
       const fieldB = b[sortBy as keyof typeof b];
@@ -227,7 +196,6 @@ export const filterAudioAnalyses = query({
       return 0;
     });
     
-    // Apply pagination in memory
     const paginatedResults = filteredResults.slice(skip, skip + limit);
     
     return {
@@ -242,7 +210,6 @@ export const filterAudioAnalyses = query({
   },
 });
 
-// Store audio blob in the database
 export const storeAudioBlob = mutation({
   args: {
     audioId: v.string(),
@@ -257,7 +224,6 @@ export const storeAudioBlob = mutation({
     console.log(`[Convex] fileSize: ${args.fileSize} bytes`);
     console.log(`[Convex] audioBlob size: ${args.audioBlob.byteLength} bytes`);
     
-    // Check if user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     console.log(`[Convex] isAuthenticated: ${isAuthenticated}`);
     
@@ -274,14 +240,12 @@ export const storeAudioBlob = mutation({
       throw new Error("User ID not found");
     }
     
-    // Check file size limit (25MB)
-    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB in bytes
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
     if (args.fileSize > MAX_FILE_SIZE) {
       console.log(`[Convex] File size exceeds limit - aborting`);
       throw new Error(`File size exceeds the 25MB limit. Current size: ${Math.round(args.fileSize / (1024 * 1024))}MB`);
     }
     
-    // Look up the existing analysis
     console.log(`[Convex] Looking up analysis for url: ${args.audioId}, userId: ${userId}`);
     const existingAnalysis = await ctx.db
       .query("audioAnalysis")
@@ -297,7 +261,6 @@ export const storeAudioBlob = mutation({
     console.log(`[Convex] Found existing analysis with ID: ${existingAnalysis._id}`);
     console.log(`[Convex] Updating record with audio blob data`);
     
-    // Update the record with audio blob data
     await ctx.db.patch(existingAnalysis._id, {
       audioBlob: args.audioBlob,
       audioFileName: args.fileName,
@@ -315,13 +278,11 @@ export const storeAudioBlob = mutation({
   }
 });
 
-// Retrieve audio blob from database
 export const getAudioBlob = query({
   args: { audioId: v.string() },
   handler: async (ctx, args) => {
     console.log(`[Convex] getAudioBlob called for audioId: ${args.audioId}`);
     
-    // Check if user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     console.log(`[Convex] isAuthenticated: ${isAuthenticated}`);
     
@@ -338,7 +299,6 @@ export const getAudioBlob = query({
       return null;
     }
     
-    // Query for the audio analysis that contains the blob
     console.log(`[Convex] Looking for analysis with url: ${args.audioId}, userId: ${userId}`);
     const analysis = await ctx.db
       .query("audioAnalysis")
@@ -369,17 +329,11 @@ export const getAudioBlob = query({
   }
 });
 
-// Retrieve audio blob from database without requiring authentication
 export const getAudioBlobPublic = query({
   args: { audioId: v.string() },
   handler: async (ctx, args) => {
     console.log(`[Convex] getAudioBlobPublic called for audioId: ${args.audioId}`);
     
-    // This query allows public access to audio blobs for playback purposes
-    // without requiring authentication
-    
-    // Query for the audio analysis that contains the blob
-    // We still need to filter by url (audioId) but we don't filter by userId
     console.log(`[Convex] Looking for any analysis with url: ${args.audioId}`);
     const analysis = await ctx.db
       .query("audioAnalysis")
@@ -410,7 +364,6 @@ export const getAudioBlobPublic = query({
   }
 });
 
-// Update existing analysis or create new if not exists
 export const updateAudioAnalysis = mutation({
   args: {
     url: v.string(),
@@ -438,10 +391,8 @@ export const updateAudioAnalysis = mutation({
     analysisDate: v.string()
   },
   handler: async (ctx, args) => {
-    // Check if the user is authenticated
     const isAuthenticated = await isUserAuthenticated(ctx);
     
-    // If the user is not logged in, don't save/update the analysis
     if (!isAuthenticated) {
       console.log("User not logged in - analysis will not be updated");
       return null;
@@ -449,7 +400,6 @@ export const updateAudioAnalysis = mutation({
     
     const userId = await getUserId(ctx);
     
-    // If we don't have a userId, abort
     if (!userId) {
       console.log("No user ID found - analysis will not be updated");
       return null;
@@ -457,7 +407,6 @@ export const updateAudioAnalysis = mutation({
     
     console.log(`Looking for existing analysis with URL ${args.url} for user ${userId}`);
     
-    // Check if entry already exists
     const existingAnalysis = await ctx.db
       .query("audioAnalysis")
       .withIndex("by_url", (q) => q.eq("url", args.url))
@@ -467,7 +416,6 @@ export const updateAudioAnalysis = mutation({
     if (existingAnalysis) {
       console.log(`Updating existing analysis with ID ${existingAnalysis._id}`);
       
-      // Update the existing entry
       await ctx.db.patch(existingAnalysis._id, {
         ...args,
         userId
@@ -477,7 +425,6 @@ export const updateAudioAnalysis = mutation({
     } else {
       console.log(`No existing analysis found, creating new entry`);
       
-      // Create a new entry
       const analysisId = await ctx.db.insert("audioAnalysis", {
         ...args,
         userId

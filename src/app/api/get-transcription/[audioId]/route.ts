@@ -13,8 +13,6 @@ export async function GET(
     if (!audioId) {
       return createErrorResponse("Audio ID is required", 400);
     }
-
-    console.log(`Fetching transcription for audio ID: ${audioId}`);
     
     const response = await fetchTranscription(audioId);
     return createApiResponse(response);

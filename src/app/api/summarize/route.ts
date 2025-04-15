@@ -6,15 +6,12 @@ import { SummarizeRequestData } from "@/types/api";
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("Starting POST request processing in /api/summarize");
     const data = await req.json() as SummarizeRequestData;
      
     const user = await currentUser();
     const userId = user?.id;
     
     const result = await processAnalysisRequest(data, userId);
-    
-    console.log("Final result prepared, returning response");
     
     return createApiResponse(result);
   } catch (error: unknown) {

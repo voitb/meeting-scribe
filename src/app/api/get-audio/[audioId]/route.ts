@@ -13,8 +13,6 @@ export async function GET(
     if (!audioId) {
       return createErrorResponse("Audio ID is required", 400);
     }
-
-    console.log(`Fetching audio with ID: ${audioId}`);
     
     try {
       const audioData = await fetchAudioFromConvex<ConvexAudioData>(

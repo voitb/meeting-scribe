@@ -169,7 +169,7 @@ async function analyzeTranscriptionChunk(
 
 		// AI call
 		const { text: analysisResponse } = await generateText({
-			model: groq("llama3-70b-8192"), // Make sure the model is appropriate
+			model: groq("llama-3.3-70b-versatile"), // Make sure the model is appropriate
 			prompt: prompt,
 			temperature: 0.3, // Slightly higher temperature may give more varied results
 			maxTokens: 4096, // Increase if expecting longer JSON responses
@@ -327,7 +327,7 @@ You are an expert meeting and lecture analyst. Your task is to analyze the provi
 
 \`\`\`json
 {
-  "summary": "A comprehensive and detailed summary of this transcription excerpt (around 50 sentences). Be thorough in your analysis, covering all important details and explaining any complex concepts. Ensure the summary is informative and provides substantial value to someone who has not heard the audio. ENGLISH ONLY. Standard ASCII.",
+  "summary": "A comprehensive and detailed summary of this transcription excerpt (not less than 25 sentences, no more than 30 sentences, but if you have nothing to add anymore then you can stop and return less than 25 sentences). Be thorough in your analysis, covering all important details and explaining any complex concepts. Ensure the summary is informative and provides substantial value to someone who has not heard the audio. ENGLISH ONLY. Standard ASCII. You need to be very detailed and specific, creating an advanced summary that can be used as a basis for a video script",
   "keyPoints": [
     "Identify the main topic or subject discussed. ENGLISH ONLY. Standard ASCII.",
     "List another significant theme or question raised. ENGLISH ONLY. Standard ASCII.",
