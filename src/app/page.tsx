@@ -8,6 +8,7 @@ import { AuthWrapper } from "@/components/auth/auth-wrapper";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MediaForm from "@/components/media-form/media-form";
 import { RecentAudioSection } from "@/components/sections/recent-audio-section";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -49,6 +50,8 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <Footer />
       </main>
     </ScrollArea>
   );
