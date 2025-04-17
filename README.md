@@ -17,8 +17,6 @@ This pivot allowed us to maintain the core AI-based analysis features while crea
   - Comprehensive summaries
   - Key points extraction
   - Video chapter detection
-  - Presentation quality assessment
-  - Glossary of terms
   - Action items detection
 - **User Experience**:
   - Modern, responsive UI with smooth animations
@@ -58,7 +56,6 @@ src/
 │   ├── analysis/       # Analysis-related components
 │   ├── history/        # History page components
 │   ├── media-form/     # Media upload components
-│   ├── presentation-quality-view/ # Quality assessment view
 │   ├── results/        # Results display components
 │   ├── sections/       # Landing page sections
 │   └── ui/             # Reusable UI components
@@ -115,13 +112,7 @@ The heart of the application is the media processing and analysis pipeline:
    - Animated transitions between different views
    - Provides a clear structure for consuming complex information
 
-3. **Presentation Quality View** (`src/components/presentation-quality-view.tsx`)
-
-   - Visualizes speaking quality assessment
-   - Identifies difficult segments with improvement suggestions
-   - Interactive navigation to problematic parts of the recording
-
-4. **Analysis History** (`src/components/history/analysis-grid.tsx`, `src/components/history/analysis-card.tsx`)
+3. **Analysis History** (`src/components/history/analysis-grid.tsx`, `src/components/history/analysis-card.tsx`)
    - Grid layout with equal-height cards for history items
    - Staggered animations for visual engagement
    - Filtering and sorting capabilities

@@ -9,25 +9,25 @@ import { AuthProvider } from "@/providers/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MeetingScribe | AI Meeting Notes",
-  description: "Transform audio recordings into meeting notes with AI analysis",
+	title: "MeetingScribe | AI Meeting Notes",
+	description: "Transform audio recordings into meeting notes with AI analysis",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider defaultTheme="dark">
-          <AuthProvider>
-            <Toaster richColors position="top-center" />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body className={`${inter.className} overflow-x-hidden`}>
+				<ThemeProvider defaultTheme="dark">
+					<AuthProvider>
+						<Toaster richColors position="top-center" />
+						{children}
+					</AuthProvider>
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }

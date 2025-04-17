@@ -15,78 +15,78 @@ import { AnalysisGrid } from "@/components/history/analysis-grid";
 import { PaginationControls } from "@/components/history/pagination-controls";
 
 export default function HistoryPage() {
-  const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+	const router = useRouter();
+	const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
-  const { filters, setters, operations, state } = useAnalysisFilters();
+	const { filters, setters, operations, state } = useAnalysisFilters();
 
-  const { currentPage } = filters;
-  const { itemsPerPage } = state;
-  const { getQueryParams, clearFilters } = operations;
-  const { setCurrentPage } = setters;
+	const { currentPage } = filters;
+	const { itemsPerPage } = state;
+	const { getQueryParams, clearFilters } = operations;
+	const { setCurrentPage } = setters;
 
-  const analysesResult = useQuery(
-    api.audio.filterAudioAnalyses,
-    getQueryParams()
-  );
+	const analysesResult = useQuery(
+		api.audio.filterAudioAnalyses,
+		getQueryParams()
+	);
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, authLoading, router]);
+	useEffect(() => {
+		if (!authLoading && !isAuthenticated) {
+			router.push("/");
+		}
+	}, [isAuthenticated, authLoading, router]);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
+	if (authLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<Loader2 className="h-10 w-10 animate-spin text-primary" />
+			</div>
+		);
+	}
 
-  return (
-    <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-background">
-        <Navbar />
+	return (
+		<ScrollArea className="h-screen">
+			<div className="min-h-screen bg-background">
+				<Navbar />
 
-        <main className="container mx-auto px-4 pt-6 pb-8">
-          <PageHeader />
+				<main className="w-full max-w-screen-xl mx-auto px-2 sm:px-4 md:px-6 pt-6 pb-8">
+					<PageHeader />
 
-          <AnalysisFilterPanel
-            filters={filters}
-            setters={setters}
-            operations={operations}
-            state={state}
-          />
+					<AnalysisFilterPanel
+						filters={filters}
+						setters={setters}
+						operations={operations}
+						state={state}
+					/>
 
-          {analysesResult && (
-            <div className="mb-4 text-muted-foreground flex items-center gap-2">
-              <span className="font-medium text-foreground">
-                {analysesResult.total}
-              </span>{" "}
-              analyses found
-            </div>
-          )}
+					{analysesResult && (
+						<div className="mb-4 text-muted-foreground flex items-center gap-2">
+							<span className="font-medium text-foreground">
+								{analysesResult.total}
+							</span>{" "}
+							analyses found
+						</div>
+					)}
 
-          <AnalysisGrid
-            results={analysesResult}
-            isLoading={!analysesResult}
-            onClearFilters={clearFilters}
-          />
+					<AnalysisGrid
+						results={analysesResult}
+						isLoading={!analysesResult}
+						onClearFilters={clearFilters}
+					/>
 
-          {analysesResult &&
-            analysesResult.pagination &&
-            analysesResult.total > itemsPerPage && (
-              <PaginationControls
-                currentPage={currentPage}
-                totalItems={analysesResult.total}
-                itemsPerPage={itemsPerPage}
-                hasMore={analysesResult.pagination.hasMore}
-                onPageChange={setCurrentPage}
-              />
-            )}
-        </main>
-      </div>
-    </ScrollArea>
-  );
+					{analysesResult &&
+						analysesResult.pagination &&
+						analysesResult.total > itemsPerPage && (
+							<PaginationControls
+								currentPage={currentPage}
+								totalItems={analysesResult.total}
+								itemsPerPage={itemsPerPage}
+								hasMore={analysesResult.pagination.hasMore}
+								onPageChange={setCurrentPage}
+							/>
+						)}
+				</main>
+			</div>
+		</ScrollArea>
+	);
 }

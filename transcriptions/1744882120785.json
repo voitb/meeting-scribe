@@ -1,0 +1,232 @@
+{
+  "task": "transcribe",
+  "language": "English",
+  "duration": 32.6,
+  "text": " In this world, it's just us You know it's not the same as it was As it was, as it was You know it's not the same",
+  "words": [
+    {
+      "word": "In",
+      "start": 0.04,
+      "end": 0.62
+    },
+    {
+      "word": "this",
+      "start": 0.62,
+      "end": 1.36
+    },
+    {
+      "word": "world,",
+      "start": 1.36,
+      "end": 2.8
+    },
+    {
+      "word": "it's",
+      "start": 2.8,
+      "end": 3.6
+    },
+    {
+      "word": "just",
+      "start": 3.6,
+      "end": 4.02
+    },
+    {
+      "word": "us",
+      "start": 4.02,
+      "end": 5.22
+    },
+    {
+      "word": "You",
+      "start": 5.22,
+      "end": 6.84
+    },
+    {
+      "word": "know",
+      "start": 6.84,
+      "end": 7.24
+    },
+    {
+      "word": "it's",
+      "start": 7.24,
+      "end": 7.86
+    },
+    {
+      "word": "not",
+      "start": 7.86,
+      "end": 8.04
+    },
+    {
+      "word": "the",
+      "start": 8.04,
+      "end": 8.34
+    },
+    {
+      "word": "same",
+      "start": 8.34,
+      "end": 8.92
+    },
+    {
+      "word": "as",
+      "start": 8.92,
+      "end": 9.54
+    },
+    {
+      "word": "it",
+      "start": 9.54,
+      "end": 9.84
+    },
+    {
+      "word": "was",
+      "start": 9.84,
+      "end": 10.6
+    },
+    {
+      "word": "As",
+      "start": 23,
+      "end": 23.22
+    },
+    {
+      "word": "it",
+      "start": 23.22,
+      "end": 23.72
+    },
+    {
+      "word": "was,",
+      "start": 23.72,
+      "end": 25.38
+    },
+    {
+      "word": "as",
+      "start": 25.38,
+      "end": 26.24
+    },
+    {
+      "word": "it",
+      "start": 26.24,
+      "end": 26.58
+    },
+    {
+      "word": "was",
+      "start": 26.58,
+      "end": 27.46
+    },
+    {
+      "word": "You",
+      "start": 28.5,
+      "end": 29.12
+    },
+    {
+      "word": "know",
+      "start": 29.12,
+      "end": 29.52
+    },
+    {
+      "word": "it's",
+      "start": 29.52,
+      "end": 30.12
+    },
+    {
+      "word": "not",
+      "start": 30.12,
+      "end": 30.4
+    },
+    {
+      "word": "the",
+      "start": 30.4,
+      "end": 30.66
+    },
+    {
+      "word": "same",
+      "start": 30.66,
+      "end": 31.4
+    }
+  ],
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0,
+      "end": 23,
+      "text": " In this world, it's just us You know it's not the same as it was",
+      "tokens": [
+        50365,
+        682,
+        341,
+        1002,
+        11,
+        309,
+        311,
+        445,
+        505,
+        509,
+        458,
+        309,
+        311,
+        406,
+        264,
+        912,
+        382,
+        309,
+        390,
+        51515
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.27906263,
+      "compression_ratio": 0.9846154,
+      "no_speech_prob": 8.7860014e-12
+    },
+    {
+      "id": 1,
+      "seek": 2300,
+      "start": 23,
+      "end": 29,
+      "text": " As it was, as it was",
+      "tokens": [
+        50365,
+        1018,
+        309,
+        390,
+        11,
+        382,
+        309,
+        390,
+        50665
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.2978565,
+      "compression_ratio": 1,
+      "no_speech_prob": 8.721723e-12
+    },
+    {
+      "id": 2,
+      "seek": 2300,
+      "start": 29,
+      "end": 32,
+      "text": " You know it's not the same",
+      "tokens": [
+        50665,
+        509,
+        458,
+        309,
+        311,
+        406,
+        264,
+        912,
+        50844
+      ],
+      "temperature": 0,
+      "avg_logprob": -0.2978565,
+      "compression_ratio": 1,
+      "no_speech_prob": 8.721723e-12
+    }
+  ],
+  "x_groq": {
+    "id": "req_01js1h8ecqfpy92ps7c3z6e0qe"
+  },
+  "metadata": {
+    "originalFileName": "As it was ~ Harry Styles covered by S!S  (short acapella)-yt.savetube.me.mp3",
+    "processingDate": "2025-04-17T09:28:42.039Z",
+    "fileSize": 521751,
+    "isVideo": false,
+    "expirationTime": 1744885722045
+  }
+}

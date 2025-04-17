@@ -225,12 +225,6 @@ async function analyzeTranscriptionChunk(
 			actionItems: parsedResponse.actionItems || [],
 			decisionsMade: parsedResponse.decisionsMade || [],
 			videoChapters: parsedResponse.videoChapters || [],
-			presentationQuality: parsedResponse.presentationQuality || {
-				overallClarity: "N/A",
-				difficultSegments: [],
-				improvementSuggestions: [],
-			},
-			glossary: parsedResponse.glossary || {},
 		};
 	} catch (error) {
 		console.error(
@@ -310,7 +304,6 @@ function createAnalysisPrompt(
 		t: s.text, // text
 	}));
 
-	// Updated prompt forcing English and standard ASCII characters
 	const prompt = `
 You are an expert meeting and lecture analyst. Your task is to analyze the provided audio transcription excerpt and generate a DETAILED and ACCURATE analysis in JSON format ONLY.
 
@@ -353,25 +346,6 @@ You are an expert meeting and lecture analyst. Your task is to analyze the provi
     }
     "... (ALWAYS identify 3-7 meaningful chapters, even for short recordings or simple content. Divide the content logically by topic or time.)"
   ],
-  "presentationQuality": {
-    "overallClarity": "Provide a brief assessment of clarity and organization. ENGLISH ONLY. Standard ASCII.",
-    "difficultSegments": [
-      {
-        "startTime": "hh:mm:ss",
-        "endTime": "hh:mm:ss",
-        "issue": "Describe the communication issue (e.g., 'Unclear explanation', 'Confusing terminology'). ENGLISH ONLY. Standard ASCII.",
-        "improvement": "Suggest a specific improvement (optional). ENGLISH ONLY. Standard ASCII."
-      }
-    ],
-    "improvementSuggestions": [
-      "List general suggestion for improving clarity or delivery. ENGLISH ONLY. Standard ASCII."
-    ]
-  },
-  "glossary": {
-    "term1": "Definition or explanation for this term or phrase. ENGLISH ONLY. Standard ASCII.",
-    "term2": "Definition or explanation for this term or phrase. ENGLISH ONLY. Standard ASCII.",
-    "... (ALWAYS identify at least 5-10 terms with definitions, even if they are general terms from the content)"
-  }
 }
 \`\`\`
 
@@ -395,16 +369,11 @@ function createEmptyResult(
 ): VideoAnalysisResult {
 	return {
 		title: title,
-		summary: `Analysis Error: ${errorMessage}`,
+		summary: "No analysis available.",
 		keyPoints: [],
 		actionItems: [],
 		decisionsMade: [],
 		videoChapters: [],
-		presentationQuality: {
-			overallClarity: "N/A",
-			difficultSegments: [],
-			improvementSuggestions: [],
-		},
-		glossary: {},
+		error: `Error: ${errorMessage}`,
 	};
 }
